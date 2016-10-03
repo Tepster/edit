@@ -1,17 +1,6 @@
 #include "editor.h"
 
 
-qint32 _t::editor::coords::row() const
-{
-    return this->_row;
-}
-
-qint32 _t::editor::coords::col() const
-{
-    return this->_col;
-}
-
-
 _t::editor::coords *_t::editor::coords::set_text(QStringList *text)
 {
     this->text = text;
@@ -28,15 +17,15 @@ _t::editor::coords *_t::editor::coords::set_row(qint32 row)
 
     if (this->text->count() > row)
     {
-        this->_row = row;
+        this->row = row;
     }
     else
     {
-        this->_row = this->text->count() - 1;
+        this->row = this->text->count() - 1;
     }
 
     // checks if isn't behind the end of the line
-    this->set_col(this->_col);
+    this->set_col(this->col);
 
     return this;
 }
@@ -48,15 +37,15 @@ _t::editor::coords *_t::editor::coords::set_col(qint32 col)
         return this;
     }
 
-    qint32 current_line_length = this->text->at(this->_row).length();
+    qint32 current_line_length = this->text->at(this->row).length();
 
     if (current_line_length >= col)
     {
-        this->_col = col;
+        this->col = col;
     }
     else
     {
-        this->_col = current_line_length;
+        this->col = current_line_length;
     }
 
     return this;
@@ -72,16 +61,16 @@ _t::editor::coords *_t::editor::coords::set(qint32 row, qint32 col)
 
 _t::editor::coords &_t::editor::coords::operator++()
 {
-    if (this->text->at(this->_row).length() > this->_col)
+    if (this->text->at(this->row).length() > this->col)
     {
-        ++this->_col;
+        ++this->col;
     }
     else
     {
-        if (this->text->count() - 1 > this->_row)
+        if (this->text->count() - 1 > this->row)
         {
-            ++this->_row;
-            this->_col = 0;
+            ++this->row;
+            this->col = 0;
         }
     }
 
@@ -99,16 +88,16 @@ _t::editor::coords _t::editor::coords::operator++(int)
 
 _t::editor::coords &_t::editor::coords::operator--()
 {
-    if (this->_col > 0)
+    if (this->col > 0)
     {
-        --this->_col;
+        --this->col;
     }
     else
     {
-        if (this->_row > 0)
+        if (this->row > 0)
         {
-            --this->_row;
-            this->_col = this->text->at(this->_row).length();
+            --this->row;
+            this->col = this->text->at(this->row).length();
         }
     }
 
@@ -176,7 +165,7 @@ _t::editor::coords &_t::editor::coords::operator-=(quint32 value)
 
 inline bool _t::editor::coords::operator==(const coords &obj) const
 {
-    return this->col() == obj.col() && this->row() == obj.row() && this->text == obj.text;
+    return this->col == obj.col && this->row == obj.row && this->text == obj.text;
 }
 
 inline bool _t::editor::coords::operator!=(const coords &obj) const
@@ -187,7 +176,7 @@ inline bool _t::editor::coords::operator!=(const coords &obj) const
 
 inline bool _t::editor::coords::operator<(const coords &obj) const
 {
-    return this->row() < obj.row() || (this->row() == obj.row() && this->col() < obj.col());
+    return this->row < obj.row || (this->row == obj.row && this->col < obj.col);
 }
 
 inline bool _t::editor::coords::operator>(const coords &obj) const

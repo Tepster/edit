@@ -33,17 +33,15 @@ class _t::editor : public QWidget
     struct coords
     {
     private:
-        QStringList *text;
-
-        qint32 _row = 0;
-        qint32 _col = 0;
+        QStringList *text = 0;
 
     public:
+        qint32 row = 0;
+        qint32 col = 0;
+
         coords() {}
         coords(QStringList *text) : text(text) {}
-
-        qint32 row() const;
-        qint32 col() const;
+        coords(qint32 row, qint32 col) : row(row), col(col) {}
 
         coords *set_text(QStringList *text);
 
@@ -74,8 +72,7 @@ class _t::editor : public QWidget
 
     struct cursor
     {
-        qint32 row = 0;
-        qint32 col = 0;
+        coords coords;
 
         QPixmap background;
     };
@@ -109,7 +106,7 @@ class _t::editor : public QWidget
     void setup_painter_clear(QPainter &painter);
     void setup_painter_write(QPainter &painter);
 
-    void clear_cell(QPainter &painter, qint32 row, qint32 col);
+    void clear_cell(QPainter &painter, const coords &coords);
     void clear_cell(QPainter &painter);
 
     void update();
