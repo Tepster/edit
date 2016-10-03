@@ -9,6 +9,7 @@ TEMPLATE = app
 SOURCES += main.cpp \
     main_window.cpp \
     editor.cpp \
+    editor_coordinates.cpp \
     label.cpp
 
 HEADERS  += \
