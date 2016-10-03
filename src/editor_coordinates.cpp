@@ -21,6 +21,11 @@ _t::editor::coords *_t::editor::coords::set_text(QStringList *text)
 
 _t::editor::coords *_t::editor::coords::set_row(qint32 row)
 {
+    if (row < 0)
+    {
+        return this;
+    }
+
     if (this->text->count() > row)
     {
         this->_row = row;
@@ -30,11 +35,19 @@ _t::editor::coords *_t::editor::coords::set_row(qint32 row)
         this->_row = this->text->count() - 1;
     }
 
+    // checks if isn't behind the end of the line
+    this->set_col(this->_col);
+
     return this;
 }
 
 _t::editor::coords *_t::editor::coords::set_col(qint32 col)
 {
+    if (col < 0)
+    {
+        return this;
+    }
+
     qint32 current_line_length = this->text->at(this->_row).length();
 
     if (current_line_length >= col)
