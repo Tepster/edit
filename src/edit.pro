@@ -9,12 +9,12 @@ TEMPLATE = app
 SOURCES += main.cpp \
     main_window.cpp \
     editor.cpp \
-    editor_coordinates.cpp \
-    label.cpp
+    editor/coords.cpp \
+    controls/label.cpp
 
 HEADERS  += \
-    includes/main_window.h \
-    includes/editor.h \
-    includes/controls.h
+    _includes/main_window.h \
+    _includes/editor.h \
+    _includes/controls.h
 
-INCLUDEPATH += includes
+INCLUDEPATH += _includes
