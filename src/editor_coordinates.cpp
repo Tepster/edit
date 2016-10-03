@@ -57,7 +57,7 @@ _t::editor::coords *_t::editor::coords::set(qint32 row, qint32 col)
 }
 
 
-_t::editor::coords _t::editor::coords::operator++()
+_t::editor::coords &_t::editor::coords::operator++()
 {
     if (this->text->at(this->_row).length() > this->_col)
     {
@@ -84,7 +84,7 @@ _t::editor::coords _t::editor::coords::operator++(int)
 }
 
 
-_t::editor::coords _t::editor::coords::operator--()
+_t::editor::coords &_t::editor::coords::operator--()
 {
     if (this->_col > 0)
     {
@@ -138,7 +138,7 @@ _t::editor::coords _t::editor::coords::operator-(quint32 value)
 }
 
 
-_t::editor::coords _t::editor::coords::operator+=(quint32 value)
+_t::editor::coords &_t::editor::coords::operator+=(quint32 value)
 {
     // very ugly and inefficient
     for (quint32 i = 0; i < value; ++i)
@@ -149,7 +149,7 @@ _t::editor::coords _t::editor::coords::operator+=(quint32 value)
     return *this;
 }
 
-_t::editor::coords _t::editor::coords::operator-=(quint32 value)
+_t::editor::coords &_t::editor::coords::operator-=(quint32 value)
 {
     // very ugly and inefficient
     for (quint32 i = 0; i < value; ++i)

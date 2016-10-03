@@ -40,7 +40,7 @@ class _t::editor : public QWidget
 
     public:
         coords() {}
-        coords(qint32 row, qint32 col) : _row(row), _col(col) {}
+        coords(QStringList *text) : text(text) {}
 
         qint32 row() const;
         qint32 col() const;
@@ -51,17 +51,17 @@ class _t::editor : public QWidget
         coords *set_col(qint32 col);
         coords *set(qint32 row, qint32 col);
 
-        coords operator++();
+        coords &operator++();
         coords operator++(int);
 
-        coords operator--();
+        coords &operator--();
         coords operator--(int);
 
         coords operator+(quint32 value);
         coords operator-(quint32 value);
 
-        coords operator+=(quint32 value);
-        coords operator-=(quint32 value);
+        coords &operator+=(quint32 value);
+        coords &operator-=(quint32 value);
     };
 
     struct cursor
