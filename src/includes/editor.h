@@ -62,6 +62,14 @@ class _t::editor : public QWidget
 
         coords &operator+=(quint32 value);
         coords &operator-=(quint32 value);
+
+        inline bool operator==(const coords &obj) const;
+        inline bool operator!=(const coords &obj) const;
+
+        inline bool operator<(const coords &obj) const;
+        inline bool operator>(const coords &obj) const;
+        inline bool operator<=(const coords &obj) const;
+        inline bool operator>=(const coords &obj) const;
     };
 
     struct cursor
