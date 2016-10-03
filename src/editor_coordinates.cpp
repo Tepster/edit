@@ -1,25 +1,25 @@
 #include "editor.h"
 
 
-qint32 _t::editor::coordinates::row() const
+qint32 _t::editor::coords::row() const
 {
     return this->_row;
 }
 
-qint32 _t::editor::coordinates::col() const
+qint32 _t::editor::coords::col() const
 {
     return this->_col;
 }
 
 
-_t::editor::coordinates *_t::editor::coordinates::set_text(QStringList *text)
+_t::editor::coords *_t::editor::coords::set_text(QStringList *text)
 {
     this->text = text;
 
     return this;
 }
 
-_t::editor::coordinates *_t::editor::coordinates::set_row(qint32 row)
+_t::editor::coords *_t::editor::coords::set_row(qint32 row)
 {
     if (this->text->count() > row)
     {
@@ -33,7 +33,7 @@ _t::editor::coordinates *_t::editor::coordinates::set_row(qint32 row)
     return this;
 }
 
-_t::editor::coordinates *_t::editor::coordinates::set_col(qint32 col)
+_t::editor::coords *_t::editor::coords::set_col(qint32 col)
 {
     qint32 current_line_length = this->text->at(this->_row).length();
 
@@ -49,7 +49,7 @@ _t::editor::coordinates *_t::editor::coordinates::set_col(qint32 col)
     return this;
 }
 
-_t::editor::coordinates *_t::editor::coordinates::set(qint32 row, qint32 col)
+_t::editor::coords *_t::editor::coords::set(qint32 row, qint32 col)
 {
     this->set_row(row)->set_col(col);
 
@@ -57,7 +57,7 @@ _t::editor::coordinates *_t::editor::coordinates::set(qint32 row, qint32 col)
 }
 
 
-_t::editor::coordinates _t::editor::coordinates::operator++()
+_t::editor::coords _t::editor::coords::operator++()
 {
     if (this->text->at(this->_row).length() > this->_col)
     {
@@ -75,16 +75,16 @@ _t::editor::coordinates _t::editor::coordinates::operator++()
     return *this;
 }
 
-_t::editor::coordinates _t::editor::coordinates::operator++(int)
+_t::editor::coords _t::editor::coords::operator++(int)
 {
-    coordinates original = *this;
+    coords original = *this;
     this->operator++();
 
     return original;
 }
 
 
-_t::editor::coordinates _t::editor::coordinates::operator--()
+_t::editor::coords _t::editor::coords::operator--()
 {
     if (this->_col > 0)
     {
@@ -102,19 +102,19 @@ _t::editor::coordinates _t::editor::coordinates::operator--()
     return *this;
 }
 
-_t::editor::coordinates _t::editor::coordinates::operator--(int)
+_t::editor::coords _t::editor::coords::operator--(int)
 {
-    coordinates original = *this;
+    coords original = *this;
     this->operator--();
 
     return original;
 }
 
 
-_t::editor::coordinates _t::editor::coordinates::operator+(quint32 value)
+_t::editor::coords _t::editor::coords::operator+(quint32 value)
 {
     // very ugly and inefficient
-    coordinates coords = *this;
+    coords coords = *this;
 
     for (quint32 i = 0; i < value; ++i)
     {
@@ -124,10 +124,10 @@ _t::editor::coordinates _t::editor::coordinates::operator+(quint32 value)
     return coords;
 }
 
-_t::editor::coordinates _t::editor::coordinates::operator-(quint32 value)
+_t::editor::coords _t::editor::coords::operator-(quint32 value)
 {
     // very ugly and inefficient
-    coordinates coords = *this;
+    coords coords = *this;
 
     for (quint32 i = 0; i < value; ++i)
     {
@@ -138,7 +138,7 @@ _t::editor::coordinates _t::editor::coordinates::operator-(quint32 value)
 }
 
 
-_t::editor::coordinates _t::editor::coordinates::operator+=(quint32 value)
+_t::editor::coords _t::editor::coords::operator+=(quint32 value)
 {
     // very ugly and inefficient
     for (quint32 i = 0; i < value; ++i)
@@ -149,7 +149,7 @@ _t::editor::coordinates _t::editor::coordinates::operator+=(quint32 value)
     return *this;
 }
 
-_t::editor::coordinates _t::editor::coordinates::operator-=(quint32 value)
+_t::editor::coords _t::editor::coords::operator-=(quint32 value)
 {
     // very ugly and inefficient
     for (quint32 i = 0; i < value; ++i)
