@@ -10,7 +10,8 @@ SOURCES += main.cpp \
     main_window.cpp \
     editor.cpp \
     editor/coords.cpp \
-    controls/label.cpp
+    controls/label.cpp \
+    editor/cursor.cpp
 
 HEADERS  += \
     _includes/main_window.h \

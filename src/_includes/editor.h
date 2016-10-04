@@ -32,6 +32,9 @@ class _t::editor : public QWidget
 
     struct coords
     {
+        // all methods ensure the coordinates to be valid
+        // according to line lengths
+
     private:
         QStringList *text = 0;
 
@@ -72,7 +75,15 @@ class _t::editor : public QWidget
 
     struct cursor
     {
+        // coords methods implicitly check the coordinates validity
+
+        // row/col getters return reference to native values
+        // which are not validated
+
         coords coords;
+
+        qint32 &row();
+        qint32 &col();
 
         QPixmap background;
     };
