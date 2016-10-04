@@ -81,7 +81,8 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
                 else
                 {
                     // go left until non-space cell
-                    while (this->active_line().at(--this->cursor.col()) == ' ' && this->cursor.col());
+                    while (this->active_line().at(--this->cursor.col()) == ' '
+                           && this->cursor.col());
 
                     if (this->cursor.col() != 0)
                     {
@@ -144,7 +145,9 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
                     (this->active_line().length() - this->cursor.col()) * this->cell_width,
                     this->cell_height);
 
-                this->clear_cell(painter, coords(this->cursor.row(), this->active_line().length() - 1));
+                this->clear_cell(
+                    painter,
+                    coords(this->cursor.row(), this->active_line().length() - 1));
             }
 
             this->update();
@@ -199,7 +202,11 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
                         line_length * this->cell_width,
                         this->cell_height);
 
-                    painter.drawRect(0, i * this->cell_height, line_length * this->cell_width, this->cell_height);
+                    painter.drawRect(
+                        0,
+                        i * this->cell_height,
+                        line_length * this->cell_width,
+                        this->cell_height);
                 }
 
                 this->update();
@@ -236,7 +243,9 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
                     (this->active_line().length() - this->cursor.col()) * this->cell_width,
                     this->cell_height);
 
-                this->clear_cell(painter, coords(this->cursor.row(), this->active_line().length() - 1));
+                this->clear_cell(
+                    painter,
+                    coords(this->cursor.row(), this->active_line().length() - 1));
             }
 
             this->update();
@@ -289,7 +298,11 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
                         line_length * this->cell_width,
                         this->cell_height);
 
-                    painter.drawRect(0, i * this->cell_height, line_length * this->cell_width, this->cell_height);
+                    painter.drawRect(
+                        0,
+                        i * this->cell_height,
+                        line_length * this->cell_width,
+                        this->cell_height);
                 }
 
                 this->update();
@@ -398,7 +411,10 @@ void _t::editor::write(const QString &text)
             else
             {
                 // create a new line with the rest of the original line
-                this->text.insert(this->cursor.row() + 1, this->active_line().right(active_line_rest_length));
+                this->text.insert(
+                    this->cursor.row() + 1,
+                    this->active_line().right(active_line_rest_length));
+
                 this->active_line().chop(active_line_rest_length);
 
                 // move the rest of the active line to the beginning of the next line
