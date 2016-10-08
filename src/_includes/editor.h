@@ -189,7 +189,10 @@ class _t::editor : public QWidget
          * @param const coords &obj
          * @return bool
          */
-        inline bool operator==(const coords &obj) const;
+        inline bool operator==(const coords &obj) const
+        {
+            return this->col == obj.col && this->row == obj.row && this->text == obj.text;
+        }
 
         /**
          * Performs non-equality check of all private and public values.
@@ -197,7 +200,10 @@ class _t::editor : public QWidget
          * @param const coords &obj
          * @return bool
          */
-        inline bool operator!=(const coords &obj) const;
+        inline bool operator!=(const coords &obj) const
+        {
+            return !(*this == obj);
+        }
 
 
         /**
@@ -206,7 +212,10 @@ class _t::editor : public QWidget
          * @param const coords &obj
          * @return bool
          */
-        inline bool operator<(const coords &obj) const;
+        inline bool operator<(const coords &obj) const
+        {
+            return this->row < obj.row || (this->row == obj.row && this->col < obj.col);
+        }
 
         /**
          * Checks if /obj/ coordinates are preceding self-coordinates.
@@ -214,7 +223,10 @@ class _t::editor : public QWidget
          * @param const coords &obj
          * @return bool
          */
-        inline bool operator>(const coords &obj) const;
+        inline bool operator>(const coords &obj) const
+        {
+            return obj < *this;
+        }
 
         /**
          * Checks if self-coordinates are preceding or equal to /obj/.
@@ -222,7 +234,10 @@ class _t::editor : public QWidget
          * @param const coords &obj
          * @return bool
          */
-        inline bool operator<=(const coords &obj) const;
+        inline bool operator<=(const coords &obj) const
+        {
+            return !(*this > obj);
+        }
 
         /**
          * Checks if /obj/ coordinates are preceding or equal to self-coordinates.
@@ -230,7 +245,10 @@ class _t::editor : public QWidget
          * @param const coords &obj
          * @return bool
          */
-        inline bool operator>=(const coords &obj) const;
+        inline bool operator>=(const coords &obj) const
+        {
+            return !(*this < obj);
+        }
     };
 
     /**

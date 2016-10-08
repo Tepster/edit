@@ -161,35 +161,3 @@ _t::editor::coords &_t::editor::coords::operator-=(quint32 value)
 
     return *this;
 }
-
-
-inline bool _t::editor::coords::operator==(const coords &obj) const
-{
-    return this->col == obj.col && this->row == obj.row && this->text == obj.text;
-}
-
-inline bool _t::editor::coords::operator!=(const coords &obj) const
-{
-    return !(*this == obj);
-}
-
-
-inline bool _t::editor::coords::operator<(const coords &obj) const
-{
-    return this->row < obj.row || (this->row == obj.row && this->col < obj.col);
-}
-
-inline bool _t::editor::coords::operator>(const coords &obj) const
-{
-    return obj < *this;
-}
-
-inline bool _t::editor::coords::operator<=(const coords &obj) const
-{
-    return !(*this > obj);
-}
-
-inline bool _t::editor::coords::operator>=(const coords &obj) const
-{
-    return !(*this < obj);
-}
