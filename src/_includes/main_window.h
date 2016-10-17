@@ -28,7 +28,7 @@ class _t::main_window : public QWidget
 
 public:
     /**
-     * @param QWidget *parent
+     * @param QWidget * parent
      */
     explicit main_window(QWidget *parent = 0);
 };

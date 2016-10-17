@@ -22,7 +22,7 @@ class _t::controls::label : public QLabel
     /**
      * Event for mouse press.
      *
-     * @param QMouseEvent *event
+     * @param QMouseEvent * event
      */
     void mousePressEvent(QMouseEvent *event);
 

@@ -9,9 +9,9 @@ TEMPLATE = app
 SOURCES += main.cpp \
     main_window.cpp \
     editor.cpp \
-    editor/coords.cpp \
     controls/label.cpp \
-    editor/cursor.cpp
+    editor/cursor.cpp \
+    editor/coordinates.cpp
 
 HEADERS  += \
     _includes/main_window.h \

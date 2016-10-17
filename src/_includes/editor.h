@@ -1,6 +1,8 @@
 #ifndef _T_EDITOR_H
 #define _T_EDITOR_H
 
+#include <functional>
+
 #include <QWidget>
 #include <QPixmap>
 #include <QPainter>
@@ -27,180 +29,189 @@ namespace _t
 }
 
 /**
- * The _t::editor class representing one editor control with specific text inside its area.
+ * The _t::editor class representing one editor control
+ * with specific text inside its area.
  */
 class _t::editor : public QWidget
 {
     Q_OBJECT
 
     /**
-     * The coords struct for handling editor coordinates.
-     * All methods ensure the coordinates to be valid according to line lengths.
+     * The _t::editor::coordinates struct which stores the row and column values
+     * and provide basic comparing functions.
+     *
+     * @note All methods implicitly validate the coordinates values.
      */
-    struct coords
+    struct coordinates
     {
-    private:
         /**
-         * Pointer to _t::editor's text for knowledge of lines lengths.
+         * Editor's text pointer for knowledge of line lengths.
          *
-         * @var QStringList *text
+         * @var const QStringList * text
          */
-        QStringList *text = 0;
+        const QStringList *text = 0;
 
-    public:
+
         /**
          * The actual row value as an x-coordinate.
          *
-         * @var qint32 row
+         * @var quint32 row
          */
-        qint32 row = 0;
+        quint32 row = 0;
 
         /**
          * The actual column value as a y-coordinate.
          *
-         * @var qint32 col
+         * @var quint32 col
          */
-        qint32 col = 0;
+        quint32 col = 0;
 
 
         /**
          * Default constructor.
          */
-        coords() {}
+        coordinates() {}
 
         /**
          * Constructor that sets-up the text pointer.
          *
-         * @param QStringList *text
+         * @param const QStringList * text
          */
-        coords(QStringList *text) : text(text) {}
+        coordinates(const QStringList *text) : text(text) {}
 
         /**
-         * Constructor that sets-up the coordinates values.
+         * Constructor that sets-up the coordinates values and text pointer.
          *
-         * @param qint32 row
-         * @param qint32 col
+         * @param quint32             row
+         * @param quint32             col
+         * @param const QStringList * text
          */
-        coords(qint32 row, qint32 col) : row(row), col(col) {}
+        coordinates(quint32 row, quint32 col, const QStringList *text = 0);
 
 
         /**
          * Sets-up the text pointer.
          *
-         * @param QStringList *text
-         * @return _t::editor::coords *  Self pointer.
+         * @param const QStringList * text
          */
-        coords *set_text(QStringList *text);
+        void set_text(const QStringList *text);
 
 
         /**
-         * Sets-up the row with validity check.
+         * Sets the row coordinate.
          *
-         * @param qint32 row
-         * @return _t::editor::coords *  Self pointer.
+         * @param quint32 row
          */
-        coords *set_row(qint32 row);
+        void set_row(quint32 row);
 
         /**
-         * Sets-up the column with validity check.
+         * Sets the column coordinate.
          *
-         * @param qint32 col
-         * @return _t::editor::coords *  Self pointer.
+         * @param quint32 col
          */
-        coords *set_col(qint32 col);
+        void set_col(quint32 col);
 
         /**
-         * Sets-up the row and column with validity check.
+         * Sets the row and column coordinates.
          *
-         * @param qint32 row
-         * @param qint32 col
-         * @return _t::editor::coords *  Self pointer.
+         * @param quint32 row
+         * @param quint32 col
          */
-        coords *set(qint32 row, qint32 col);
+        void set(quint32 row, quint32 col);
 
 
         /**
-         * Places coordinates one cell forward, if valid.
+         * Assings the new coordinates and performs validity check.
+         * Does not change *text if null.
          *
-         * @return _t::editor::coords &  Self ref.
+         * @param _t::editor::coordinates coords
+         * @return _t::editor::coordinates &
          */
-        coords &operator++();
+        coordinates &operator=(const coordinates &coords);
+
 
         /**
-         * Places coordinates one cell forward, if valid.
+         * Places the coordinates one cell forward.
          *
-         * @return _t::editor::coords  Original coordinates.
+         * @return _t::editor::coordinates &
          */
-        coords operator++(int);
-
+        coordinates &operator++();
 
         /**
-         * Places coordinates one cell backward, if valid.
+         * Places the coordinates one cell forward.
          *
-         * @return _t::editor::coords &  Self ref.
+         * @return _t::editor::coordinates
          */
-        coords &operator--();
+        coordinates operator++(int);
+
 
         /**
-         * Places coordinates one cell backward, if valid.
+         * Places the coordinates one cell backward.
          *
-         * @return _t::editor::coords  Original coordinates.
+         * @return _t::editor::coordinates &
          */
-        coords operator--(int);
+        coordinates &operator--();
+
+        /**
+         * Places the coordinates one cell backward.
+         *
+         * @return _t::editor::coordinates
+         */
+        coordinates operator--(int);
 
 
         /**
-         * Create coordinates with /value/ cells forward, till valid.
+         * Creates new coordinates /value/ cells forward.
          *
          * @param quint32 value
-         * @return _t::editor::coords  New coordinates.
+         * @return _t::editor::coordinates
          */
-        coords operator+(quint32 value);
+        coordinates operator+(quint32 value) const;
 
         /**
-         * Create coordinates with /value/ cells backward, till valid.
+         * Creates new coordinates /value/ cells backward.
          *
-         * @param qint32 value
-         * @return _t::editor::coords  New coordinates.
+         * @param quint32 value
+         * @return _t::editor::coordinates
          */
-        coords operator-(quint32 value);
-
-
-        /**
-         * Move /value/ cells forward, till valid.
-         *
-         * @param qint32 value
-         * @return _t::editor::coords &  Self ref.
-         */
-        coords &operator+=(quint32 value);
-
-        /**
-         * Move /value/ cells backward, till valid.
-         *
-         * @param qint32 value
-         * @return _t::editor::coords &  Self ref.
-         */
-        coords &operator-=(quint32 value);
+        coordinates operator-(quint32 value) const;
 
 
         /**
-         * Performs equality check of all private and public values.
+         * Moves the coordinates /value/ cells forward.
          *
-         * @param const coords &obj
+         * @param quint32 value
+         * @return _t::editor::coordinates &
+         */
+        coordinates &operator+=(quint32 value);
+
+        /**
+         * Moves the coordinates /value/ cells backward.
+         *
+         * @param quint32 value
+         * @return _t::editor::coordinates &
+         */
+        coordinates &operator-=(quint32 value);
+
+
+        /**
+         * Performs equality check of row and column values.
+         *
+         * @param const coordinates & obj
          * @return bool
          */
-        inline bool operator==(const coords &obj) const
+        inline bool operator==(const coordinates &obj) const
         {
-            return this->col == obj.col && this->row == obj.row && this->text == obj.text;
+            return this->col == obj.col && this->row == obj.row;
         }
 
         /**
-         * Performs non-equality check of all private and public values.
+         * Performs non-equality check of row and column values.
          *
-         * @param const coords &obj
+         * @param const coordinates &obj
          * @return bool
          */
-        inline bool operator!=(const coords &obj) const
+        inline bool operator!=(const coordinates &obj) const
         {
             return !(*this == obj);
         }
@@ -209,21 +220,22 @@ class _t::editor : public QWidget
         /**
          * Checks if self-coordinates are preceding /obj/.
          *
-         * @param const coords &obj
+         * @param const coordinates &obj
          * @return bool
          */
-        inline bool operator<(const coords &obj) const
+        inline bool operator<(const coordinates &obj) const
         {
-            return this->row < obj.row || (this->row == obj.row && this->col < obj.col);
+            return this->row < obj.row
+                || (this->row == obj.row && this->col < obj.col);
         }
 
         /**
          * Checks if /obj/ coordinates are preceding self-coordinates.
          *
-         * @param const coords &obj
+         * @param const coordinates &obj
          * @return bool
          */
-        inline bool operator>(const coords &obj) const
+        inline bool operator>(const coordinates &obj) const
         {
             return obj < *this;
         }
@@ -231,40 +243,53 @@ class _t::editor : public QWidget
         /**
          * Checks if self-coordinates are preceding or equal to /obj/.
          *
-         * @param const coords &obj
+         * @param const coordinates &obj
          * @return bool
          */
-        inline bool operator<=(const coords &obj) const
+        inline bool operator<=(const coordinates &obj) const
         {
             return !(*this > obj);
         }
 
         /**
-         * Checks if /obj/ coordinates are preceding or equal to self-coordinates.
+         * Checks if /obj/ coordinates are preceding
+         * or equal to self-coordinates.
          *
-         * @param const coords &obj
+         * @param const coordinates &obj
          * @return bool
          */
-        inline bool operator>=(const coords &obj) const
+        inline bool operator>=(const coordinates &obj) const
         {
             return !(*this < obj);
         }
     };
 
     /**
-     * The cursor struct representing one cursor specified mainly by its coordinates.
-     *
-     * Coords struct methods implicitly check the coordinates validity.
-     * Row/column getters return reference to native values which are not validated.
+     * The _t::editor::cursor struct.
      */
     struct cursor
     {
         /**
          * The cursor coordinates.
          *
-         * @var _t::editor::coords coords
+         * @var _t::editor::coordinates coords
          */
-        coords coords;
+        coordinates coords;
+
+
+        /**
+         * States if the cursor is in selection mode (have some cells selected).
+         *
+         * @var bool selection_mode
+         */
+        bool selection_mode = false;
+
+        /**
+         * Coordinates where the selection began.
+         *
+         * @var _t::editor::coordinates selection_from
+         */
+        coordinates selection_from;
 
 
         /**
@@ -276,18 +301,59 @@ class _t::editor : public QWidget
 
 
         /**
-         * Cursor coordinates row getter.
-         *
-         * @return qint32 &  Row ref.
+         * @return quint32 &
          */
-        qint32 &row();
+        quint32 &row();
 
         /**
-         * Cursor coordinates column getter.
-         *
-         * @return qint32 &  Column ref.
+         * @return quint32 &
          */
-        qint32 &col();
+        quint32 &col();
+
+
+        /**
+         * Places the cursor one cell forward.
+         *
+         * @return _t::editor::cursor &
+         */
+        cursor &operator++();
+
+        /**
+         * Places the cursor one cell forward.
+         *
+         * @return _t::editor::cursor
+         */
+        cursor operator++(int);
+
+
+        /**
+         * Places the cursor one cell backward.
+         *
+         * @return _t::editor::cursor &
+         */
+        cursor &operator--();
+
+        /**
+         * Places the cursor one cell backward.
+         *
+         * @return _t::editor::cursor
+         */
+        cursor operator--(int);
+
+
+        /**
+         * Places the cursor /value/ cells forward.
+         *
+         * @return _t::editor::cursor &
+         */
+        cursor &operator+=(qint32 value);
+
+        /**
+         * Places the cursor /value/ cells backward.
+         *
+         * @return _t::editor::cursor &
+         */
+        cursor &operator-=(qint32 value);
     };
 
 
@@ -312,6 +378,13 @@ class _t::editor : public QWidget
      * @var QColor background
      */
     QColor background;
+
+    /**
+     * The background color for selected cells.
+     *
+     * @var QColor selection_background
+     */
+    QColor selection_background;
 
 
     /**
@@ -341,9 +414,9 @@ class _t::editor : public QWidget
 
 
     /**
-     * @var _t::editor::cursor cursor
+     * @var _t::editor::cursor _cursor
      */
-    cursor cursor;
+    cursor _cursor;
 
     /**
      * Timer for cursor blinking.
@@ -361,7 +434,8 @@ class _t::editor : public QWidget
 
 
     /**
-     * The actual text in the editor, saved in list for easy manipulation with line lengths.
+     * The actual text in the editor, saved in list for easy manipulation
+     * with line lengths.
      *
      * @var QStringList text
      */
@@ -378,23 +452,24 @@ class _t::editor : public QWidget
     /**
      * Handles any user input from keyboard.
      *
-     * @param QKeyEvent *event
+     * @param QKeyEvent * event
      */
     void keyPressEvent(QKeyEvent *event);
 
     /**
      * Handles focus-in event.
      *
-     * @param QFocusEvent *event
+     * @param QFocusEvent * event
      */
     void focusInEvent(QFocusEvent *event);
 
     /**
      * Handles focus-out event.
      *
-     * @param QFocusEvent *event
+     * @param QFocusEvent * event
      */
     void focusOutEvent(QFocusEvent *event);
+
 
 
     /**
@@ -408,14 +483,14 @@ class _t::editor : public QWidget
     /**
      * Sets-up the painter to a clearing mode.
      *
-     * @param QPainter &painter
+     * @param QPainter & painter
      */
     void setup_painter_clear(QPainter &painter);
 
     /**
      * Sets-up the painter to a writing mode.
      *
-     * @param QPainter &painter
+     * @param QPainter & painter
      */
     void setup_painter_write(QPainter &painter);
 
@@ -423,23 +498,73 @@ class _t::editor : public QWidget
     /**
      * Clears the specified cell.
      *
-     * @param QPainter &painter
-     * @param const _t::editor::coords &coords
+     * @param QPainter &                      painter
+     * @param const _t::editor::coordinates & coords
      */
-    void clear_cell(QPainter &painter, const coords &coords);
+    void clear_cell(QPainter &painter, const coordinates &coords);
 
     /**
      * Clears the cell where the cursor is currently placed.
      *
-     * @param QPainter &painter
+     * @param QPainter & painter
      */
     void clear_cell(QPainter &painter);
+
+
+    /**
+     * Deselect all selected cells.
+     */
+    void deselect();
+
+
+    /**
+     * Apply selected-cell style to the active cell.
+     */
+    void draw_selected_cell();
+
+    /**
+     * Apply selected-cell style to the cell.
+     *
+     * @param const _t::editor::coordinates & coords
+     */
+    void draw_selected_cell(const coordinates &coords);
+
+    /**
+     * Apply normal cell style to the active cell.
+     */
+    void draw_deselected_cell();
+
+    /**
+     * Apply normal cell style to the cell.
+     *
+     * @param const _t::editor::coordinates & coords
+     */
+    void draw_deselected_cell(const coordinates &coords);
+
+
+    /**
+     * Redraw the background color of the cell.
+     *
+     * @param const _t::editor::coordinates & coords
+     * @param const QColor &                  color
+     */
+    void redraw_cell_bg(const coordinates &coords, const QColor &color);
 
 
     /**
      * Displays the editor canvas on the screen.
      */
     void update();
+
+
+
+    /**
+     * Places the cursor to specified coordinates.
+     *
+     * @param _t::editor::coordinates & coords
+     * @param bool                      selection
+     */
+    void cursor_move(const coordinates &coords, bool selection = false);
 
 
     /**
@@ -461,6 +586,21 @@ class _t::editor : public QWidget
      * Deactivates the cursor blinking.
      */
     void cursor_deactivate();
+
+
+
+    /**
+     * Applies a function to each cell of the coordinates range.
+     * Range coordinates must be in ascending order.
+     *
+     * @param const _t::editor::coordinates &                      start
+     * @param const _t::editor::coordinates &                      end
+     * @param std::function<void(const _t::editor::coordinates &)> func
+     */
+    void each_cell(
+        const coordinates &start,
+        const coordinates &end,
+        std::function<void(const coordinates &)> func);
 
 private slots:
     /**
