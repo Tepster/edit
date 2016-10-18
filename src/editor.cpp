@@ -95,8 +95,33 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
             break;
 
         case Qt::Key_Home:
-            // find the target position for cursor
-            //this->cursor_move(some_coords);
+        {
+            quint32 i = 0;
+
+            // go with /i/ to beginning of non-white characters
+            while (i < this->active_line().length()
+                && this->active_line().at(i) == ' ')
+            {
+                ++i;
+            }
+
+            // cursor is in non-white characters area
+            // OR at the beginning of the line
+            if (i < this->_cursor.col() || this->_cursor.col() == 0)
+            {
+                // move it to /i/
+                this->cursor_move(
+                    coordinates(this->_cursor.row(), i),
+                    selection);
+            }
+            else
+            {
+                // move to the beginning of the line
+                this->cursor_move(
+                    coordinates(this->_cursor.row(), 0),
+                    selection);
+            }
+        }
             break;
 
         case Qt::Key_End:
