@@ -31,9 +31,9 @@ void _t::editor::init(QWidget *parent_widget)
     this->area.resize(this->width(), this->height());
     connect(
         &this->area,
-        SIGNAL(clicked(QPoint)),
+        SIGNAL(clicked(QMouseEvent *)),
         this,
-        SLOT(area_clicked(QPoint)));
+        SLOT(area_clicked(QMouseEvent *)));
 
     // todo: same size as 'this'
     this->canvas = QPixmap(1280, 720);
@@ -391,8 +391,13 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void _t::editor::area_clicked(QPoint coords)
+void _t::editor::area_clicked(QMouseEvent *event)
 {
+    if (event->button() != Qt::LeftButton)
+    {
+        return;
+    }
+
     this->cursor_deactivate();
 
     if (QApplication::keyboardModifiers() != Qt::ShiftModifier)
@@ -400,11 +405,9 @@ void _t::editor::area_clicked(QPoint coords)
         this->deselect();
     }
 
-    // todo: set cursor only if clicked by LMB
-
-    qint32 row = coords.y() / this->cell_height;
-    qint32 col = coords.x() / this->cell_width;
-    if (coords.x() % this->cell_width > this->cell_width / 2)
+    qint32 row = event->localPos().y() / this->cell_height;
+    qint32 col = event->localPos().x() / this->cell_width;
+    if ((qint32)event->localPos().x() % this->cell_width > this->cell_width / 2)
     {
         ++col;
     }

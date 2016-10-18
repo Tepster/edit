@@ -5,5 +5,5 @@
 
 void _t::controls::label::mousePressEvent(QMouseEvent *event)
 {
-    emit this->clicked(event->localPos().toPoint());
+    emit this->clicked(event);
 }

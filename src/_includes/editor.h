@@ -8,6 +8,7 @@
 #include <QPainter>
 
 #include <QKeyEvent>
+#include <QMouseEvent>
 #include <QFocusEvent>
 
 #include <QTimer>
@@ -606,9 +607,9 @@ private slots:
     /**
      * Handles any user input from mouse.
      *
-     * @param QPoint coords
+     * @param QMouseEvent * event
      */
-    void area_clicked(QPoint coords);
+    void area_clicked(QMouseEvent *event);
 
     /**
      * Handles showing/hiding cursor when blinking.

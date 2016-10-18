@@ -2,7 +2,6 @@
 #define _T_CONTROLS_H
 
 #include <QLabel>
-#include <QPoint>
 
 #include <QMouseEvent>
 
@@ -30,9 +29,9 @@ signals:
     /**
      * Signal for mouse click.
      *
-     * @param QPoint coords
+     * @param QMouseEvent * event
      */
-    void clicked(QPoint coords);
+    void clicked(QMouseEvent *event);
 };
 
 #endif // _T_CONTROLS_H
