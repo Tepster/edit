@@ -490,7 +490,8 @@ void _t::editor::mouse_move(QMouseEvent *event)
     {
         col = 0;
     }
-    else if ((qint32)event->localPos().x() % this->cell_width > this->cell_width / 2)
+    else if ((qint32)event->localPos().x() % this->cell_width
+        > this->cell_width / 2)
     {
         ++col;
     }
