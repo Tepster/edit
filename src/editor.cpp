@@ -31,9 +31,16 @@ void _t::editor::init(QWidget *parent_widget)
     this->area.resize(this->width(), this->height());
     connect(
         &this->area,
-        SIGNAL(clicked(QMouseEvent *)),
+        SIGNAL(mouse_pressed(QMouseEvent *)),
         this,
-        SLOT(area_clicked(QMouseEvent *)));
+        SLOT(mouse_press(QMouseEvent *)));
+
+    this->area.setMouseTracking(true);
+    connect(
+        &this->area,
+        SIGNAL(mouse_moved(QMouseEvent *)),
+        this,
+        SLOT(mouse_move(QMouseEvent *)));
 
     // todo: same size as 'this'
     this->canvas = QPixmap(1280, 720);
@@ -391,9 +398,9 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void _t::editor::area_clicked(QMouseEvent *event)
+void _t::editor::mouse_press(QMouseEvent *event)
 {
-    if (event->button() != Qt::LeftButton)
+    if (event->buttons() != Qt::LeftButton)
     {
         return;
     }
@@ -415,6 +422,27 @@ void _t::editor::area_clicked(QMouseEvent *event)
     this->cursor_move(
         coordinates(row, col),
         QApplication::keyboardModifiers() == Qt::ShiftModifier);
+
+    this->cursor_activate();
+}
+
+void _t::editor::mouse_move(QMouseEvent *event)
+{
+    if (event->buttons() != Qt::LeftButton)
+    {
+        return;
+    }
+
+    this->cursor_deactivate();
+
+    qint32 row = event->localPos().y() / this->cell_height;
+    qint32 col = event->localPos().x() / this->cell_width;
+    if ((qint32)event->localPos().x() % this->cell_width > this->cell_width / 2)
+    {
+        ++col;
+    }
+
+    this->cursor_move(coordinates(row, col), true);
 
     this->cursor_activate();
 }

@@ -605,11 +605,19 @@ class _t::editor : public QWidget
 
 private slots:
     /**
-     * Handles any user input from mouse.
+     * Handles any user input from mouse buttons.
      *
      * @param QMouseEvent * event
      */
-    void area_clicked(QMouseEvent *event);
+    void mouse_press(QMouseEvent *event);
+
+    /**
+     * Handles mouse movement.
+     *
+     * @param QMouseEvent * event
+     */
+    void mouse_move(QMouseEvent *event);
+
 
     /**
      * Handles showing/hiding cursor when blinking.

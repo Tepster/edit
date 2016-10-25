@@ -25,13 +25,27 @@ class _t::controls::label : public QLabel
      */
     void mousePressEvent(QMouseEvent *event);
 
-signals:
     /**
-     * Signal for mouse click.
+     * Event for mouse move.
      *
      * @param QMouseEvent * event
      */
-    void clicked(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+
+signals:
+    /**
+     * Signal for mouse press.
+     *
+     * @param QMouseEvent * event
+     */
+    void mouse_pressed(QMouseEvent *event);
+
+    /**
+     * Signal for mouse move.
+     *
+     * @param QMouseEvent * event
+     */
+    void mouse_moved(QMouseEvent *event);
 };
 
 #endif // _T_CONTROLS_H
