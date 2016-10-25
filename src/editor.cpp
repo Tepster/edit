@@ -437,7 +437,17 @@ void _t::editor::mouse_move(QMouseEvent *event)
 
     qint32 row = event->localPos().y() / this->cell_height;
     qint32 col = event->localPos().x() / this->cell_width;
-    if ((qint32)event->localPos().x() % this->cell_width > this->cell_width / 2)
+
+    if (row < 0)
+    {
+        row = 0;
+    }
+
+    if (col < 0)
+    {
+        col = 0;
+    }
+    else if ((qint32)event->localPos().x() % this->cell_width > this->cell_width / 2)
     {
         ++col;
     }
