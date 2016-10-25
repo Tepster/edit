@@ -371,6 +371,49 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
         this->write("    ");
     }
 
+    else if (event->key() == Qt::Key_C)
+    {
+        if (event->modifiers() == Qt::ControlModifier)
+        {
+            if (this->_cursor.selection_mode)
+            {
+                QString text;
+
+                coordinates begin;
+                coordinates end;
+
+                if (this->_cursor.selection_from < this->_cursor.coords)
+                {
+                    begin = this->_cursor.selection_from;
+                    end = this->_cursor.coords - 1;
+                }
+                else
+                {
+                    begin = this->_cursor.coords;
+                    end = this->_cursor.selection_from;
+                }
+
+                this->each_cell(begin, end, [&](const coordinates &coords)
+                {
+                    if (this->text[coords.row].length() > coords.col)
+                    {
+                        text += this->text[coords.row][coords.col];
+                    }
+                    else
+                    {
+                        text += this->newline_character;
+                    }
+                });
+
+                QApplication::clipboard()->setText(text);
+            }
+        }
+        else
+        {
+            this->write(event->text());
+        }
+    }
+
     else if (event->key() == Qt::Key_V)
     {
         if (event->modifiers() == Qt::ControlModifier)
