@@ -20,6 +20,7 @@
 #include <QFont>
 #include <QColor>
 #include <QPoint>
+#include <QSize>
 
 #include "controls.h"
 
@@ -83,8 +84,8 @@ class _t::editor : public QWidget
         /**
          * Constructor that sets-up the coordinates values and text pointer.
          *
-         * @param quint32             row
-         * @param quint32             col
+         * @param       quint32       row
+         * @param       quint32       col
          * @param const QStringList * text
          */
         coordinates(quint32 row, quint32 col, const QStringList *text = 0);
@@ -357,6 +358,184 @@ class _t::editor : public QWidget
         cursor &operator-=(qint32 value);
     };
 
+    /**
+     * The _t::editor::drawing_manager class which provides functions
+     * for drawing on a canvas.
+     */
+    class drawing_manager
+    {
+        /**
+         * Painter for drawing on canvas.
+         *
+         * @var QPainter painter
+         */
+        QPainter painter;
+
+        /**
+         * The canvas for drawing.
+         *
+         * @var QPixmap * canvas
+         */
+        QPixmap *canvas;
+
+
+        /**
+         * The background color.
+         *
+         * @var QColor background
+         */
+        QColor background;
+
+        /**
+         * The font family and style.
+         *
+         * @var QFont font
+         */
+        QFont font;
+
+        /**
+         * The default font color.
+         *
+         * @var QColor font_color
+         */
+        QColor font_color;
+
+        /**
+         * @var QSize cell_size *
+         */
+        QSize *cell_size;
+
+
+        /**
+         * Sets-up the painter to clearing mode.
+         */
+        void setup_clearing();
+
+        /**
+         * Sets-up the painter to clearing mode by specified background color.
+         *
+         * @param const QColor & color
+         */
+        void setup_clearing(const QColor &color);
+
+        /**
+         * Sets-up the painter to writing mode.
+         */
+        void setup_writing();
+
+    public:
+        /**
+         * Main initializer of default values.
+         *
+         * @param       QPixmap * canvas
+         * @param const QColor  & background
+         * @param const QFont   & font
+         * @param const QColor  & font_color
+         * @param       QSize   * cell_size
+         */
+        void init(
+            QPixmap *canvas,
+            const QColor &background,
+            const QFont &font,
+            const QColor &font_color,
+            QSize *cell_size);
+
+
+        /**
+         * Paints the character to specified coordinates.
+         *
+         * @param const _t::editor::coordinates & coords
+         * @param const QChar                   & character
+         */
+        void draw_char(const coordinates &coords, const QChar &character);
+
+        /**
+         * Paints the character to specified coordinates.
+         *
+         * @param const _t::editor::coordinates & coords
+         * @param const QChar                   & character
+         * @param const QColor                  & background
+         */
+        void draw_char(
+            const coordinates &coords,
+            const QChar &character,
+            const QColor &background);
+
+        /**
+         * Draws the cursor to the specified cell.
+         *
+         * @param const _t::editor::coordinates & coords
+         */
+        void draw_cursor(const coordinates &coords);
+
+        /**
+         * Draws the pixmap to the specified cell.
+         *
+         * @param const _t::editor::coordinates & coords
+         * @param const QPixmap                 & pixmap
+         */
+        void draw_pixmap(const coordinates &coords, const QPixmap &pixmap);
+
+
+        /**
+         * Moves the area to destination and clears the source.
+         * Source and destination areas must not overlap.
+         *
+         * @param const _t::editor::coordinates & src
+         * @param       qint32                    num
+         * @param const _t::editor::coordinates & dst
+         */
+        void move(const coordinates &src, qint32 num, const coordinates &dst);
+
+        /**
+         * Shifts the area one row up.
+         *
+         * @param const _t::editor::coordinates & coords
+         * @param       qint32                    num
+         */
+        void shift_up(const coordinates &coords, qint32 num);
+
+        /**
+         * Shifts the area one row down.
+         *
+         * @param const _t::editor::coordinates & coords
+         * @param       qint32                    num
+         */
+        void shift_down(const coordinates &coords, qint32 num);
+
+        /**
+         * Shifts the area one cell left.
+         *
+         * @param const _t::editor::coordinates & coords
+         * @param       qint32                    num
+         */
+        void shift_left(const coordinates &coords, qint32 num);
+
+        /**
+         * Shifts the area one cell right.
+         *
+         * @param const _t::editor::coordinates & coords
+         * @param       qint32                    num
+         */
+        void shift_right(const coordinates &coords, qint32 num);
+
+
+        /**
+         * Clears the specified cell with default background color.
+         *
+         * @param const _t::editor::coordinates & coords
+         */
+        void clear(const coordinates &coords);
+
+        /**
+         * Clears the specified cell with the specified color.
+         *
+         * @param const _t::editor::coordinates & coords
+         * @param const QColor                  & color
+         */
+        void clear(const coordinates &coords, const QColor &color);
+    };
+
 
     /**
      * The main QLabel-based element to which the canvas is associated.
@@ -372,13 +551,13 @@ class _t::editor : public QWidget
      */
     QPixmap canvas;
 
-
     /**
-     * The editor background color.
+     * The drawing manager that paints on the canvas.
      *
-     * @var QColor background
+     * @var _t::editor::drawing_manager painter
      */
-    QColor background;
+    drawing_manager painter;
+
 
     /**
      * The background color for selected cells.
@@ -387,31 +566,10 @@ class _t::editor : public QWidget
      */
     QColor selection_background;
 
-
     /**
-     * The editor font family and style.
-     *
-     * @var QFont font
+     * @var QSize cell_size
      */
-    QFont font;
-
-    /**
-     * The default font color used in editor.
-     *
-     * @var QColor font_color
-     */
-    QColor font_color;
-
-
-    /**
-     * @var qint32 cell_width
-     */
-    qint32 cell_width = 9;
-
-    /**
-     * @var qint32 cell_height
-     */
-    qint32 cell_height = 18;
+    QSize cell_size;
 
 
     /**
@@ -481,36 +639,6 @@ class _t::editor : public QWidget
     QString &active_line();
 
 
-    /**
-     * Sets-up the painter to a clearing mode.
-     *
-     * @param QPainter & painter
-     */
-    void setup_painter_clear(QPainter &painter);
-
-    /**
-     * Sets-up the painter to a writing mode.
-     *
-     * @param QPainter & painter
-     */
-    void setup_painter_write(QPainter &painter);
-
-
-    /**
-     * Clears the specified cell.
-     *
-     * @param QPainter &                      painter
-     * @param const _t::editor::coordinates & coords
-     */
-    void clear_cell(QPainter &painter, const coordinates &coords);
-
-    /**
-     * Clears the cell where the cursor is currently placed.
-     *
-     * @param QPainter & painter
-     */
-    void clear_cell(QPainter &painter);
-
 
     /**
      * Deselect all selected cells.
@@ -519,9 +647,12 @@ class _t::editor : public QWidget
 
 
     /**
-     * Apply selected-cell style to the active cell.
+     * Deletes the character at specified coordinates.
+     *
+     * @param const _t::editor::coordinates & coords
      */
-    void draw_selected_cell();
+    void delete_char(const coordinates &coords);
+
 
     /**
      * Apply selected-cell style to the cell.
@@ -529,11 +660,6 @@ class _t::editor : public QWidget
      * @param const _t::editor::coordinates & coords
      */
     void draw_selected_cell(const coordinates &coords);
-
-    /**
-     * Apply normal cell style to the active cell.
-     */
-    void draw_deselected_cell();
 
     /**
      * Apply normal cell style to the cell.
@@ -544,19 +670,9 @@ class _t::editor : public QWidget
 
 
     /**
-     * Redraw the background color of the cell.
-     *
-     * @param const _t::editor::coordinates & coords
-     * @param const QColor &                  color
-     */
-    void redraw_cell_bg(const coordinates &coords, const QColor &color);
-
-
-    /**
      * Displays the editor canvas on the screen.
      */
     void update();
-
 
 
     /**
@@ -589,14 +705,13 @@ class _t::editor : public QWidget
     void cursor_deactivate();
 
 
-
     /**
      * Applies a function to each cell of the coordinates range.
      * Range coordinates must be in ascending order.
      *
-     * @param const _t::editor::coordinates &                      start
-     * @param const _t::editor::coordinates &                      end
-     * @param std::function<void(const _t::editor::coordinates &)> func
+     * @param const _t::editor::coordinates                              & start
+     * @param const _t::editor::coordinates                              & end
+     * @param       std::function<void(const _t::editor::coordinates &)>   func
      */
     void each_cell(
         const coordinates &start,

@@ -13,12 +13,6 @@ void _t::editor::init(QWidget *parent_widget)
     // todo: start maximized
     this->resize(1280, 720);
 
-    this->background = QColor(60, 60, 65);
-    this->selection_background = QColor(100, 100, 110);
-
-    this->font = QFont("Consolas", 12);
-    this->font_color = QColor(250, 250, 250);
-
     this->cursor_timer.setParent(this);
     connect(
         &this->cursor_timer,
@@ -44,7 +38,16 @@ void _t::editor::init(QWidget *parent_widget)
 
     // todo: same size as 'this'
     this->canvas = QPixmap(1280, 720);
-    this->canvas.fill(this->background);
+
+    this->cell_size = QSize(9, 18);
+    this->selection_background = QColor(100, 100, 110);
+
+    this->painter.init(
+        &this->canvas,
+        QColor(60, 60, 65),
+        QFont("Consolas", 12),
+        QColor(250, 250, 250),
+        &this->cell_size);
 
     this->setCursor(Qt::IBeamCursor);
 
@@ -158,106 +161,7 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
     {
         this->cursor_deactivate();
 
-        // cursor is not at the beginning of the line
-        if (this->_cursor.col() > 0)
-        {
-            --this->_cursor.col();
-
-            QPainter painter(&this->canvas);
-            this->setup_painter_clear(painter);
-
-            this->clear_cell(painter);
-
-            // cursor is not at the end of the line
-            if (this->_cursor.col() + 1 < this->active_line().length())
-            {
-                // move the rest of the active line one cell left
-                painter.drawPixmap(
-                    this->_cursor.col() * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    this->canvas,
-                    (this->_cursor.col() + 1) * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    (this->active_line().length() - this->_cursor.col())
-                        * this->cell_width,
-                    this->cell_height);
-
-                this->clear_cell(
-                    painter,
-                    coordinates(
-                        this->_cursor.row(),
-                        this->active_line().length() - 1));
-            }
-
-            this->update();
-
-            this->active_line().remove(this->_cursor.col(), 1);
-        }
-
-        // cursor is at the beginning of the line
-        else
-        {
-            if (this->_cursor.row() > 0)
-            {
-                --this->_cursor.row();
-                this->_cursor.col() = this->active_line().length();
-
-                QPainter painter(&this->canvas);
-                this->setup_painter_clear(painter);
-
-                // original line isn't empty
-                if (this->text[this->_cursor.row() + 1].length() > 0)
-                {
-                    // move the remaining text to the end of the line
-                    painter.drawPixmap(
-                        this->_cursor.col() * this->cell_width,
-                        this->_cursor.row() * this->cell_height,
-                        this->canvas,
-                        0,
-                        (this->_cursor.row() + 1) * this->cell_height,
-                        this->text[this->_cursor.row() + 1].length()
-                            * this->cell_width,
-                        this->cell_height);
-
-                    painter.drawRect(
-                        0,
-                        (this->_cursor.row() + 1) * this->cell_height,
-                        this->text[this->_cursor.row() + 1].length()
-                            * this->cell_width,
-                        this->cell_height);
-
-                    this->active_line()
-                        .append(this->text[this->_cursor.row() + 1]);
-                }
-
-                // move all following lines one row up
-                for (qint32 i = this->_cursor.row() + 2;
-                     i < this->text.count();
-                     ++i)
-                {
-                    qint32 line_length = this->text[i].length();
-
-                    painter.drawPixmap(
-                        0,
-                        (i - 1) * this->cell_height,
-                        this->canvas,
-                        0,
-                        i * this->cell_height,
-                        line_length * this->cell_width,
-                        this->cell_height);
-
-                    painter.drawRect(
-                        0,
-                        i * this->cell_height,
-                        line_length * this->cell_width,
-                        this->cell_height);
-                }
-
-                this->update();
-
-                this->text.removeAt(this->_cursor.row() + 1);
-            }
-        }
+        this->delete_char(--this->_cursor.coords);
 
         this->cursor_activate();
     }
@@ -266,102 +170,7 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
     {
         this->cursor_deactivate();
 
-        // cursor is not at the end of the line
-        if (this->_cursor.col() < this->active_line().length())
-        {
-            QPainter painter(&this->canvas);
-            this->setup_painter_clear(painter);
-
-            this->clear_cell(painter);
-
-            // cursor is not before the last letter in the line
-            if (this->_cursor.col() + 1 < this->active_line().length())
-            {
-                // move the rest of the active line one cell left
-                painter.drawPixmap(
-                    this->_cursor.col() * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    this->canvas,
-                    (this->_cursor.col() + 1) * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    (this->active_line().length() - this->_cursor.col())
-                        * this->cell_width,
-                    this->cell_height);
-
-                this->clear_cell(
-                    painter,
-                    coordinates(
-                        this->_cursor.row(),
-                        this->active_line().length() - 1));
-            }
-
-            this->update();
-
-            this->active_line().remove(this->_cursor.col(), 1);
-        }
-
-        // cursor is at the end of the line
-        else
-        {
-            // cursor is not at the last line
-            if (this->_cursor.row() + 1 < this->text.length())
-            {
-                QPainter painter(&this->canvas);
-                this->setup_painter_clear(painter);
-
-                // next line isn't empty
-                if (this->text[this->_cursor.row() + 1].length() > 0)
-                {
-                    // move the next line to the end of this line
-                    painter.drawPixmap(
-                        this->_cursor.col() * this->cell_width,
-                        this->_cursor.row() * this->cell_height,
-                        this->canvas,
-                        0,
-                        (this->_cursor.row() + 1) * this->cell_height,
-                        this->text[this->_cursor.row() + 1].length()
-                            * this->cell_width,
-                        this->cell_height);
-
-                    painter.drawRect(
-                        0,
-                        (this->_cursor.row() + 1) * this->cell_height,
-                        this->text[this->_cursor.row() + 1].length()
-                            * this->cell_width,
-                        this->cell_height);
-
-                    this->active_line()
-                        .append(this->text[this->_cursor.row() + 1]);
-                }
-
-                // move all following lines one row up
-                for (qint32 i = this->_cursor.row() + 2;
-                     i < this->text.count();
-                     ++i)
-                {
-                    qint32 line_length = this->text[i].length();
-
-                    painter.drawPixmap(
-                        0,
-                        (i - 1) * this->cell_height,
-                        this->canvas,
-                        0,
-                        i * this->cell_height,
-                        line_length * this->cell_width,
-                        this->cell_height);
-
-                    painter.drawRect(
-                        0,
-                        i * this->cell_height,
-                        line_length * this->cell_width,
-                        this->cell_height);
-                }
-
-                this->update();
-
-                this->text.removeAt(this->_cursor.row() + 1);
-            }
-        }
+        this->delete_char(this->_cursor.coords);
 
         this->cursor_activate();
     }
@@ -455,9 +264,10 @@ void _t::editor::mouse_press(QMouseEvent *event)
         this->deselect();
     }
 
-    qint32 row = event->localPos().y() / this->cell_height;
-    qint32 col = event->localPos().x() / this->cell_width;
-    if ((qint32)event->localPos().x() % this->cell_width > this->cell_width / 2)
+    qint32 row = event->localPos().y() / this->cell_size.height();
+    qint32 col = event->localPos().x() / this->cell_size.width();
+    if ((qint32)event->localPos().x() % this->cell_size.width()
+        > this->cell_size.width() / 2)
     {
         ++col;
     }
@@ -478,8 +288,8 @@ void _t::editor::mouse_move(QMouseEvent *event)
 
     this->cursor_deactivate();
 
-    qint32 row = event->localPos().y() / this->cell_height;
-    qint32 col = event->localPos().x() / this->cell_width;
+    qint32 row = event->localPos().y() / this->cell_size.height();
+    qint32 col = event->localPos().x() / this->cell_size.width();
 
     if (row < 0)
     {
@@ -490,8 +300,8 @@ void _t::editor::mouse_move(QMouseEvent *event)
     {
         col = 0;
     }
-    else if ((qint32)event->localPos().x() % this->cell_width
-        > this->cell_width / 2)
+    else if ((qint32)event->localPos().x() % this->cell_size.width()
+        > this->cell_size.width() / 2)
     {
         ++col;
     }
@@ -516,17 +326,13 @@ void _t::editor::write(const QString &text)
 {
     this->cursor_deactivate();
 
-    QPainter painter(&this->canvas);
-
     for (QChar character : text)
     {
+        qint32 line_rest_length = this->active_line().length()
+            - this->_cursor.col();
+
         if (character == this->newline_character)
         {
-            qint32 active_line_rest_length = this->active_line().length()
-                - this->_cursor.col();
-
-            this->setup_painter_clear(painter);
-
             // cursor is not at the last line
             if (this->_cursor.row() + 1 < this->text.count())
             {
@@ -535,20 +341,9 @@ void _t::editor::write(const QString &text)
                      i > this->_cursor.row();
                      --i)
                 {
-                    painter.drawPixmap(
-                        0,
-                        (i + 1) * this->cell_height,
-                        this->canvas,
-                        0,
-                        i * this->cell_height,
-                        this->cell_width * this->text[i].length(),
-                        this->cell_height);
-
-                    painter.drawRect(
-                        0,
-                        i * this->cell_height,
-                        this->cell_width * this->text[i].length(),
-                        this->cell_height);
+                    this->painter.shift_down(
+                        coordinates(i, 0),
+                        this->text.at(i).length());
                 }
             }
 
@@ -562,26 +357,16 @@ void _t::editor::write(const QString &text)
                 // create a new line with the rest of the original line
                 this->text.insert(
                     this->_cursor.row() + 1,
-                    this->active_line().right(active_line_rest_length));
+                    this->active_line().right(line_rest_length));
 
-                this->active_line().chop(active_line_rest_length);
+                this->active_line().chop(line_rest_length);
 
                 // move the rest of the active line
                 // to the beginning of the next line
-                painter.drawPixmap(
-                    0,
-                    (this->_cursor.row() + 1) * this->cell_height,
-                    this->canvas,
-                    this->_cursor.col() * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    this->cell_width * active_line_rest_length,
-                    this->cell_height);
-
-                painter.drawRect(
-                    this->_cursor.col() * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    this->cell_width * active_line_rest_length,
-                    this->cell_height);
+                this->painter.move(
+                    this->_cursor.coords,
+                    line_rest_length,
+                    coordinates(this->_cursor.row() + 1, 0));
             }
 
             ++this->_cursor.row();
@@ -591,46 +376,21 @@ void _t::editor::write(const QString &text)
         // character is not a newline
         else
         {
-            // cursor is not at the end of line
+            // cursor is not at the end of the line
             if (this->_cursor.col() < this->active_line().length())
             {
-                this->setup_painter_clear(painter);
-
-                // move the rest of the active line one cell right
-                painter.drawPixmap(
-                    (this->_cursor.col() + 1) * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    this->canvas,
-                    this->_cursor.col() * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    this->cell_width
-                        * (this->active_line().length() - this->_cursor.col()),
-                    this->cell_height);
-
-                painter.drawRect(
-                    this->_cursor.col() * this->cell_width,
-                    this->_cursor.row() * this->cell_height,
-                    this->cell_width,
-                    this->cell_height);
+                this->painter.shift_right(
+                    this->_cursor.coords,
+                    line_rest_length);
             }
 
-            this->setup_painter_write(painter);
-
-            painter.drawText(
-                this->_cursor.col() * this->cell_width,
-                this->_cursor.row() * this->cell_height,
-                this->cell_width,
-                this->cell_height,
-                0,
-                character);
+            this->painter.draw_char(this->_cursor.coords, character);
 
             this->active_line().insert(this->_cursor.col(), character);
 
             ++this->_cursor.col();
         }
     }
-
-    painter.end();
 
     this->update();
 
@@ -641,34 +401,6 @@ void _t::editor::write(const QString &text)
 QString &_t::editor::active_line()
 {
     return this->text[this->_cursor.row()];
-}
-
-
-void _t::editor::setup_painter_clear(QPainter &painter)
-{
-    painter.setPen(this->background);
-    painter.setBrush(QBrush(this->background));
-}
-
-void _t::editor::setup_painter_write(QPainter &painter)
-{
-    painter.setFont(this->font);
-    painter.setPen(this->font_color);
-}
-
-
-void _t::editor::clear_cell(QPainter &painter, const coordinates &coords)
-{
-    painter.drawRect(
-        coords.col * this->cell_width,
-        coords.row * this->cell_height,
-        this->cell_width,
-        this->cell_height);
-}
-
-void _t::editor::clear_cell(QPainter &painter)
-{
-    this->clear_cell(painter, this->_cursor.coords);
 }
 
 
@@ -702,50 +434,80 @@ void _t::editor::deselect()
 }
 
 
-void _t::editor::draw_selected_cell()
+void _t::editor::delete_char(const coordinates &coords)
 {
-    this->draw_selected_cell(this->_cursor.coords);
+    // coords not at the end of the line
+    if (coords.col < this->text.at(coords.row).length())
+    {
+        this->painter.clear(coords);
+
+        this->painter.shift_left(
+            coords,
+            this->text.at(coords.row).length() - coords.col);
+
+        this->update();
+
+        this->active_line().remove(coords.col, 1);
+    }
+
+    // coords at the end of the line
+    else
+    {
+        // there is a line below this
+        if (this->text.count() - 1 > coords.row)
+        {
+            // next line isn't empty
+            if (this->text.at(coords.row + 1).length() > 0)
+            {
+                this->painter.move(
+                    coordinates(coords.row + 1, 0),
+                    this->text.at(coords.row + 1).length(),
+                    coords);
+
+                this->text[coords.row].append(this->text.at(coords.row + 1));
+            }
+
+            // move all following lines one row up
+            for (qint32 i = coords.row + 2; i < this->text.count(); ++i)
+            {
+                this->painter.shift_up(
+                    coordinates(i, 0),
+                    this->text.at(i).length());
+            }
+
+            this->update();
+
+            this->text.removeAt(coords.row + 1);
+        }
+    }
 }
+
 
 void _t::editor::draw_selected_cell(const _t::editor::coordinates &coords)
 {
-    this->redraw_cell_bg(coords, this->selection_background);
-}
-
-void _t::editor::draw_deselected_cell()
-{
-    this->draw_deselected_cell(this->_cursor.coords);
+    if (coords.col < this->text.at(coords.row).length())
+    {
+        this->painter.draw_char(
+            coords,
+            this->text.at(coords.row).at(coords.col),
+            this->selection_background);
+    }
+    else
+    {
+        this->painter.clear(coords, this->selection_background);
+    }
 }
 
 void _t::editor::draw_deselected_cell(const _t::editor::coordinates &coords)
 {
-    this->redraw_cell_bg(coords, this->background);
-}
+    this->painter.clear(coords);
 
-
-void _t::editor::redraw_cell_bg(
-    const _t::editor::coordinates &coords,
-    const QColor &color)
-{
-    QPainter painter(&this->canvas);
-    painter.setPen(color);
-    painter.setBrush(QBrush(color));
-
-    painter.drawRect(
-        coords.col * this->cell_width,
-        coords.row * this->cell_height,
-        this->cell_width,
-        this->cell_height);
-
-    this->setup_painter_write(painter);
-
-    painter.drawText(
-        coords.col * this->cell_width,
-        coords.row * this->cell_height,
-        this->cell_width,
-        this->cell_height,
-        0,
-        QChar(this->text[coords.row][coords.col]));
+    if (coords.col < this->text.at(coords.row).length())
+    {
+        this->painter.draw_char(
+            coords,
+            this->text.at(coords.row).at(coords.col));
+    }
 }
 
 
@@ -926,19 +688,12 @@ void _t::editor::cursor_show()
     if (!this->cursor_visible)
     {
         this->_cursor.background = this->canvas.copy(
-            this->_cursor.col() * this->cell_width,
-            this->_cursor.row() * this->cell_height,
-            this->cell_width,
-            this->cell_height);
+            this->_cursor.col() * this->cell_size.width(),
+            this->_cursor.row() * this->cell_size.height(),
+            this->cell_size.width(),
+            this->cell_size.height());
 
-        QPainter painter(&this->canvas);
-
-        painter.fillRect(
-            this->_cursor.col() * this->cell_width,
-            this->_cursor.row() * this->cell_height,
-            2,
-            this->cell_height,
-            QColor(50, 170, 110));
+        this->painter.draw_cursor(this->_cursor.coords);
 
         this->update();
 
@@ -950,13 +705,8 @@ void _t::editor::cursor_hide()
 {
     if (this->cursor_visible)
     {
-        QPainter painter(&this->canvas);
-
-        painter.drawPixmap(
-            this->_cursor.col() * this->cell_width,
-            this->_cursor.row() * this->cell_height,
-            this->cell_width,
-            this->cell_height,
+        this->painter.draw_pixmap(
+            this->_cursor.coords,
             this->_cursor.background);
 
         this->update();

@@ -11,7 +11,8 @@ SOURCES += main.cpp \
     editor.cpp \
     controls/label.cpp \
     editor/cursor.cpp \
-    editor/coordinates.cpp
+    editor/coordinates.cpp \
+    editor/drawing_manager.cpp
 
 HEADERS  += \
     _includes/main_window.h \
