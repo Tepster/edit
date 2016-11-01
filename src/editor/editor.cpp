@@ -161,7 +161,10 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         this->cursor_deactivate();
 
-        this->delete_char(--this->cursor.coords);
+        if (this->cursor.coords)
+        {
+            this->delete_char(--this->cursor.coords);
+        }
 
         this->cursor_activate();
     }
@@ -442,7 +445,7 @@ void _t::editor::editor::delete_char(const coordinates &coords)
         this->painter.clear(coords);
 
         this->painter.shift_left(
-            coords,
+            coordinates(coords.row, coords.col + 1),
             this->text.at(coords.row).length() - coords.col);
 
         this->update();

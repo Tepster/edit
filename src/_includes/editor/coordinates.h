@@ -238,6 +238,17 @@ struct _t::editor::coordinates
     {
         return !(*this < obj);
     }
+
+
+    /**
+     * Checks if coordinates are at [0,0] or not.
+     *
+     * @return bool
+     */
+    inline operator bool() const
+    {
+        return this->row || this->col;
+    }
 };
 
 #endif // _T_EDITOR_COORDINATES_H
