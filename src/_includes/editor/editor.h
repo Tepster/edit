@@ -79,9 +79,9 @@ class _t::editor::editor : public QWidget
 
 
     /**
-     * @var _t::editor::cursor _cursor
+     * @var _t::editor::cursor cursor
      */
-    _t::editor::cursor _cursor;
+    _t::editor::cursor cursor;
 
     /**
      * Timer for cursor blinking.

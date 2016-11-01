@@ -55,7 +55,7 @@ void _t::editor::editor::init(QWidget *parent_widget)
 
     this->text << "";
 
-    this->_cursor.coords.set_text(&this->text);
+    this->cursor.coords.set_text(&this->text);
 
     this->setFocus();
 }
@@ -83,24 +83,24 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
         switch (event->key())
         {
         case Qt::Key_Left:
-            this->cursor_move(this->_cursor.coords - 1, selection);
+            this->cursor_move(this->cursor.coords - 1, selection);
             break;
 
         case Qt::Key_Up:
             this->cursor_move(
                 coordinates(
-                    this->_cursor.row() > 0 ? this->_cursor.row() - 1 : 0,
-                    this->_cursor.col()),
+                    this->cursor.row() > 0 ? this->cursor.row() - 1 : 0,
+                    this->cursor.col()),
                 selection);
             break;
 
         case Qt::Key_Right:
-            this->cursor_move(this->_cursor.coords + 1, selection);
+            this->cursor_move(this->cursor.coords + 1, selection);
             break;
 
         case Qt::Key_Down:
             this->cursor_move(
-                coordinates(this->_cursor.row() + 1, this->_cursor.col()),
+                coordinates(this->cursor.row() + 1, this->cursor.col()),
                 selection);
             break;
 
@@ -117,18 +117,18 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 
             // cursor is in non-white characters area
             // OR at the beginning of the line
-            if (i < this->_cursor.col() || this->_cursor.col() == 0)
+            if (i < this->cursor.col() || this->cursor.col() == 0)
             {
                 // move it to /i/
                 this->cursor_move(
-                    coordinates(this->_cursor.row(), i),
+                    coordinates(this->cursor.row(), i),
                     selection);
             }
             else
             {
                 // move to the beginning of the line
                 this->cursor_move(
-                    coordinates(this->_cursor.row(), 0),
+                    coordinates(this->cursor.row(), 0),
                     selection);
             }
         }
@@ -136,16 +136,16 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 
         case Qt::Key_End:
             this->cursor_move(
-                coordinates(this->_cursor.row(), this->active_line().length()),
+                coordinates(this->cursor.row(), this->active_line().length()),
                 selection);
             break;
 
         case Qt::Key_PageUp:
-            //this->_cursor.move(some_coords);
+            //this->cursor.move(some_coords);
             break;
 
         case Qt::Key_PageDown:
-            //this->_cursor.move(some_coords);
+            //this->cursor.move(some_coords);
             break;
         }
 
@@ -161,7 +161,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         this->cursor_deactivate();
 
-        this->delete_char(--this->_cursor.coords);
+        this->delete_char(--this->cursor.coords);
 
         this->cursor_activate();
     }
@@ -170,7 +170,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         this->cursor_deactivate();
 
-        this->delete_char(this->_cursor.coords);
+        this->delete_char(this->cursor.coords);
 
         this->cursor_activate();
     }
@@ -184,22 +184,22 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         if (event->modifiers() == Qt::ControlModifier)
         {
-            if (this->_cursor.selection_mode)
+            if (this->cursor.selection_mode)
             {
                 QString text;
 
                 coordinates begin;
                 coordinates end;
 
-                if (this->_cursor.selection_from < this->_cursor.coords)
+                if (this->cursor.selection_from < this->cursor.coords)
                 {
-                    begin = this->_cursor.selection_from;
-                    end = this->_cursor.coords - 1;
+                    begin = this->cursor.selection_from;
+                    end = this->cursor.coords - 1;
                 }
                 else
                 {
-                    begin = this->_cursor.coords;
-                    end = this->_cursor.selection_from;
+                    begin = this->cursor.coords;
+                    end = this->cursor.selection_from;
                 }
 
                 this->each_cell(begin, end, [&](const coordinates &coords)
@@ -329,16 +329,16 @@ void _t::editor::editor::write(const QString &text)
     for (QChar character : text)
     {
         qint32 line_rest_length = this->active_line().length()
-            - this->_cursor.col();
+            - this->cursor.col();
 
         if (character == this->newline_character)
         {
             // cursor is not at the last line
-            if (this->_cursor.row() + 1 < this->text.count())
+            if (this->cursor.row() + 1 < this->text.count())
             {
                 // move all following lines one row down
                 for (qint32 i = this->text.count() - 1;
-                     i > this->_cursor.row();
+                     i > this->cursor.row();
                      --i)
                 {
                     this->painter.shift_down(
@@ -348,15 +348,15 @@ void _t::editor::editor::write(const QString &text)
             }
 
             // cursor is at the end of the line
-            if (this->_cursor.col() == this->active_line().length())
+            if (this->cursor.col() == this->active_line().length())
             {
-                this->text.insert(this->_cursor.row() + 1, "");
+                this->text.insert(this->cursor.row() + 1, "");
             }
             else
             {
                 // create a new line with the rest of the original line
                 this->text.insert(
-                    this->_cursor.row() + 1,
+                    this->cursor.row() + 1,
                     this->active_line().right(line_rest_length));
 
                 this->active_line().chop(line_rest_length);
@@ -364,31 +364,31 @@ void _t::editor::editor::write(const QString &text)
                 // move the rest of the active line
                 // to the beginning of the next line
                 this->painter.move(
-                    this->_cursor.coords,
+                    this->cursor.coords,
                     line_rest_length,
-                    coordinates(this->_cursor.row() + 1, 0));
+                    coordinates(this->cursor.row() + 1, 0));
             }
 
-            ++this->_cursor.row();
-            this->_cursor.col() = 0;
+            ++this->cursor.row();
+            this->cursor.col() = 0;
         }
 
         // character is not a newline
         else
         {
             // cursor is not at the end of the line
-            if (this->_cursor.col() < this->active_line().length())
+            if (this->cursor.col() < this->active_line().length())
             {
                 this->painter.shift_right(
-                    this->_cursor.coords,
+                    this->cursor.coords,
                     line_rest_length);
             }
 
-            this->painter.draw_char(this->_cursor.coords, character);
+            this->painter.draw_char(this->cursor.coords, character);
 
-            this->active_line().insert(this->_cursor.col(), character);
+            this->active_line().insert(this->cursor.col(), character);
 
-            ++this->_cursor.col();
+            ++this->cursor.col();
         }
     }
 
@@ -400,31 +400,31 @@ void _t::editor::editor::write(const QString &text)
 
 QString &_t::editor::editor::active_line()
 {
-    return this->text[this->_cursor.row()];
+    return this->text[this->cursor.row()];
 }
 
 
 void _t::editor::editor::deselect()
 {
-    if (!this->_cursor.selection_mode)
+    if (!this->cursor.selection_mode)
     {
         return;
     }
 
-    this->_cursor.selection_mode = false;
+    this->cursor.selection_mode = false;
 
     coordinates from, to;
 
     // selection goes in forward direction
-    if (this->_cursor.coords > this->_cursor.selection_from)
+    if (this->cursor.coords > this->cursor.selection_from)
     {
-        from = this->_cursor.selection_from;
-        to = this->_cursor.coords - 1;
+        from = this->cursor.selection_from;
+        to = this->cursor.coords - 1;
     }
     else
     {
-        from = this->_cursor.coords;
-        to = this->_cursor.selection_from;
+        from = this->cursor.coords;
+        to = this->cursor.selection_from;
     }
 
     this->each_cell(from, to, [&](const coordinates &coords)
@@ -533,21 +533,21 @@ void _t::editor::editor::cursor_move(
     if (selection)
     {
         // target coordinates are behind current cursor coordinates
-        if (target_coords > this->_cursor.coords)
+        if (target_coords > this->cursor.coords)
         {
             // nothing is selected
             // OR selection started before current cursor coordinates
-            if (!this->_cursor.selection_mode
-                || this->_cursor.selection_from < this->_cursor.coords)
+            if (!this->cursor.selection_mode
+                || this->cursor.selection_from < this->cursor.coords)
             {
                 // initiate selection
-                if (!this->_cursor.selection_mode)
+                if (!this->cursor.selection_mode)
                 {
-                    this->_cursor.selection_from = this->_cursor.coords;
-                    this->_cursor.selection_mode = true;
+                    this->cursor.selection_from = this->cursor.coords;
+                    this->cursor.selection_mode = true;
                 }
 
-                this->each_cell(this->_cursor.coords, target_coords - 1,
+                this->each_cell(this->cursor.coords, target_coords - 1,
                     [&](const coordinates &coords)
                     {
                         this->draw_selected_cell(coords);
@@ -558,9 +558,9 @@ void _t::editor::editor::cursor_move(
             else
             {
                 // target coordinates are before or at original selection start
-                if (target_coords <= this->_cursor.selection_from)
+                if (target_coords <= this->cursor.selection_from)
                 {
-                    this->each_cell(this->_cursor.coords, target_coords - 1,
+                    this->each_cell(this->cursor.coords, target_coords - 1,
                         [&](const coordinates &coords)
                         {
                             this->draw_deselected_cell(coords);
@@ -568,14 +568,14 @@ void _t::editor::editor::cursor_move(
                 }
 
                 // target coordinates are where the selection started
-                else if (target_coords == this->_cursor.selection_from + 1)
+                else if (target_coords == this->cursor.selection_from + 1)
                 {
-                    this->_cursor.selection_mode = false;
+                    this->cursor.selection_mode = false;
 
                     // deselect whole selection
                     this->each_cell(
-                        this->_cursor.coords,
-                        this->_cursor.selection_from,
+                        this->cursor.coords,
+                        this->cursor.selection_from,
                         [&](const coordinates &coords)
                         {
                             this->draw_deselected_cell(coords);
@@ -587,17 +587,17 @@ void _t::editor::editor::cursor_move(
                 {
                     // deselect the original selection
                     this->each_cell(
-                        this->_cursor.coords,
-                        this->_cursor.selection_from,
+                        this->cursor.coords,
+                        this->cursor.selection_from,
                         [&](const coordinates &coords)
                         {
                             this->draw_deselected_cell(coords);
                         });
 
-                    ++this->_cursor.selection_from;
+                    ++this->cursor.selection_from;
 
                     this->each_cell(
-                        this->_cursor.selection_from,
+                        this->cursor.selection_from,
                         target_coords - 1,
                         [&](const coordinates &coords)
                         {
@@ -608,21 +608,21 @@ void _t::editor::editor::cursor_move(
         }
 
         // target coordinates are before current cursor coordinates
-        else if (target_coords != this->_cursor.coords)
+        else if (target_coords != this->cursor.coords)
         {
             // nothing is selected
             // OR selection started behind or at current cursor coordinates
-            if (!this->_cursor.selection_mode
-                || this->_cursor.selection_from >= this->_cursor.coords)
+            if (!this->cursor.selection_mode
+                || this->cursor.selection_from >= this->cursor.coords)
             {
                 // initiate selection
-                if (!this->_cursor.selection_mode)
+                if (!this->cursor.selection_mode)
                 {
-                    this->_cursor.selection_from = this->_cursor.coords - 1;
-                    this->_cursor.selection_mode = true;
+                    this->cursor.selection_from = this->cursor.coords - 1;
+                    this->cursor.selection_mode = true;
                 }
 
-                this->each_cell(target_coords, this->_cursor.coords - 1,
+                this->each_cell(target_coords, this->cursor.coords - 1,
                     [&](const coordinates &coords)
                     {
                         this->draw_selected_cell(coords);
@@ -633,9 +633,9 @@ void _t::editor::editor::cursor_move(
             else
             {
                 // target coordinates are after original selection start
-                if (target_coords > this->_cursor.selection_from)
+                if (target_coords > this->cursor.selection_from)
                 {
-                    this->each_cell(target_coords, this->_cursor.coords - 1,
+                    this->each_cell(target_coords, this->cursor.coords - 1,
                         [&](const coordinates &coords)
                         {
                             this->draw_deselected_cell(coords);
@@ -643,14 +643,14 @@ void _t::editor::editor::cursor_move(
                 }
 
                 // target coordinates are where the selection started
-                else if (target_coords == this->_cursor.selection_from)
+                else if (target_coords == this->cursor.selection_from)
                 {
-                    this->_cursor.selection_mode = false;
+                    this->cursor.selection_mode = false;
 
                     // deselect whole selection
                     this->each_cell(
-                        this->_cursor.selection_from,
-                        this->_cursor.coords - 1,
+                        this->cursor.selection_from,
+                        this->cursor.coords - 1,
                         [&](const coordinates &coords)
                         {
                             this->draw_deselected_cell(coords);
@@ -662,16 +662,16 @@ void _t::editor::editor::cursor_move(
                 {
                     // deselect the original selection
                     this->each_cell(
-                        this->_cursor.selection_from,
-                        this->_cursor.coords - 1,
+                        this->cursor.selection_from,
+                        this->cursor.coords - 1,
                         [&](const coordinates &coords)
                         {
                             this->draw_deselected_cell(coords);
                         });
 
-                    --this->_cursor.selection_from;
+                    --this->cursor.selection_from;
 
-                    this->each_cell(target_coords, this->_cursor.selection_from,
+                    this->each_cell(target_coords, this->cursor.selection_from,
                         [&](const coordinates &coords)
                         {
                             this->draw_selected_cell(coords);
@@ -681,7 +681,7 @@ void _t::editor::editor::cursor_move(
         }
     }
 
-    this->_cursor.coords = target_coords;
+    this->cursor.coords = target_coords;
 }
 
 
@@ -689,13 +689,13 @@ void _t::editor::editor::cursor_show()
 {
     if (!this->cursor_visible)
     {
-        this->_cursor.background = this->canvas.copy(
-            this->_cursor.col() * this->cell_size.width(),
-            this->_cursor.row() * this->cell_size.height(),
+        this->cursor.background = this->canvas.copy(
+            this->cursor.col() * this->cell_size.width(),
+            this->cursor.row() * this->cell_size.height(),
             this->cell_size.width(),
             this->cell_size.height());
 
-        this->painter.draw_cursor(this->_cursor.coords);
+        this->painter.draw_cursor(this->cursor.coords);
 
         this->update();
 
@@ -708,8 +708,8 @@ void _t::editor::editor::cursor_hide()
     if (this->cursor_visible)
     {
         this->painter.draw_pixmap(
-            this->_cursor.coords,
-            this->_cursor.background);
+            this->cursor.coords,
+            this->cursor.background);
 
         this->update();
 
