@@ -1,4 +1,4 @@
-#include "editor.h"
+#include "editor/editor.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -6,7 +6,7 @@
 #include <QChar>
 
 
-void _t::editor::init(QWidget *parent_widget)
+void _t::editor::editor::init(QWidget *parent_widget)
 {
     this->setParent(parent_widget);
 
@@ -61,7 +61,7 @@ void _t::editor::init(QWidget *parent_widget)
 }
 
 
-void _t::editor::keyPressEvent(QKeyEvent *event)
+void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 {
     // home, end, left, up, right, down, pageup, pagedown
     if (event->key() >= 0x01000010 && event->key() <= 0x01000017)
@@ -250,7 +250,7 @@ void _t::editor::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void _t::editor::mouse_press(QMouseEvent *event)
+void _t::editor::editor::mouse_press(QMouseEvent *event)
 {
     if (event->buttons() != Qt::LeftButton)
     {
@@ -279,7 +279,7 @@ void _t::editor::mouse_press(QMouseEvent *event)
     this->cursor_activate();
 }
 
-void _t::editor::mouse_move(QMouseEvent *event)
+void _t::editor::editor::mouse_move(QMouseEvent *event)
 {
     if (event->buttons() != Qt::LeftButton)
     {
@@ -311,18 +311,18 @@ void _t::editor::mouse_move(QMouseEvent *event)
     this->cursor_activate();
 }
 
-void _t::editor::focusInEvent(QFocusEvent *)
+void _t::editor::editor::focusInEvent(QFocusEvent *)
 {
     this->cursor_activate();
 }
 
-void _t::editor::focusOutEvent(QFocusEvent *)
+void _t::editor::editor::focusOutEvent(QFocusEvent *)
 {
     this->cursor_deactivate();
 }
 
 
-void _t::editor::write(const QString &text)
+void _t::editor::editor::write(const QString &text)
 {
     this->cursor_deactivate();
 
@@ -398,13 +398,13 @@ void _t::editor::write(const QString &text)
 }
 
 
-QString &_t::editor::active_line()
+QString &_t::editor::editor::active_line()
 {
     return this->text[this->_cursor.row()];
 }
 
 
-void _t::editor::deselect()
+void _t::editor::editor::deselect()
 {
     if (!this->_cursor.selection_mode)
     {
@@ -434,7 +434,7 @@ void _t::editor::deselect()
 }
 
 
-void _t::editor::delete_char(const coordinates &coords)
+void _t::editor::editor::delete_char(const coordinates &coords)
 {
     // coords not at the end of the line
     if (coords.col < this->text.at(coords.row).length())
@@ -483,7 +483,8 @@ void _t::editor::delete_char(const coordinates &coords)
 }
 
 
-void _t::editor::draw_selected_cell(const _t::editor::coordinates &coords)
+void _t::editor::editor::draw_selected_cell(
+    const _t::editor::coordinates &coords)
 {
     if (coords.col < this->text.at(coords.row).length())
     {
@@ -498,7 +499,8 @@ void _t::editor::draw_selected_cell(const _t::editor::coordinates &coords)
     }
 }
 
-void _t::editor::draw_deselected_cell(const _t::editor::coordinates &coords)
+void _t::editor::editor::draw_deselected_cell(
+    const _t::editor::coordinates &coords)
 {
     this->painter.clear(coords);
 
@@ -511,13 +513,13 @@ void _t::editor::draw_deselected_cell(const _t::editor::coordinates &coords)
 }
 
 
-void _t::editor::update()
+void _t::editor::editor::update()
 {
     this->area.setPixmap(this->canvas);
 }
 
 
-void _t::editor::cursor_move(
+void _t::editor::editor::cursor_move(
     const _t::editor::coordinates &coords,
     bool selection)
 {
@@ -683,7 +685,7 @@ void _t::editor::cursor_move(
 }
 
 
-void _t::editor::cursor_show()
+void _t::editor::editor::cursor_show()
 {
     if (!this->cursor_visible)
     {
@@ -701,7 +703,7 @@ void _t::editor::cursor_show()
     }
 }
 
-void _t::editor::cursor_hide()
+void _t::editor::editor::cursor_hide()
 {
     if (this->cursor_visible)
     {
@@ -715,14 +717,14 @@ void _t::editor::cursor_hide()
     }
 }
 
-void _t::editor::cursor_activate()
+void _t::editor::editor::cursor_activate()
 {
     this->cursor_show();
 
     this->cursor_timer.start();
 }
 
-void _t::editor::cursor_deactivate()
+void _t::editor::editor::cursor_deactivate()
 {
     this->cursor_timer.stop();
 
@@ -730,7 +732,7 @@ void _t::editor::cursor_deactivate()
 }
 
 
-void _t::editor::cursor_timer_tick()
+void _t::editor::editor::cursor_timer_tick()
 {
     if (this->cursor_visible)
     {
@@ -743,7 +745,7 @@ void _t::editor::cursor_timer_tick()
 }
 
 
-void _t::editor::each_cell(
+void _t::editor::editor::each_cell(
     const coordinates &start,
     const coordinates &end,
     std::function<void(const coordinates &)> func)

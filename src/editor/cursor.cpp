@@ -1,4 +1,4 @@
-#include "editor.h"
+#include "editor/cursor.h"
 
 
 quint32 &_t::editor::cursor::row()

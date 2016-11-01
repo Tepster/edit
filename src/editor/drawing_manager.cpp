@@ -1,4 +1,4 @@
-#include "editor.h"
+#include "editor/drawing_manager.h"
 
 
 void _t::editor::drawing_manager::init(

@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "editor.h"
+#include "editor/editor.h"
 
 
 namespace _t
@@ -22,9 +22,9 @@ class _t::main_window : public QWidget
     /**
      * The editor control.
      *
-     * @var _t::editor editor
+     * @var _t::editor::editor editor
      */
-    _t::editor editor;
+    _t::editor::editor editor;
 
 public:
     /**

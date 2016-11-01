@@ -1,4 +1,4 @@
-#include "editor.h"
+#include "editor/coordinates.h"
 
 
 _t::editor::coordinates::coordinates(
