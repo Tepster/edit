@@ -91,7 +91,7 @@ void _t::editor::drawing_manager::move(
     qint32 num,
     const coordinates &dst)
 {
-    if (num <= 0)
+    if (num <= 0 || src == dst)
     {
         return;
     }
@@ -107,11 +107,23 @@ void _t::editor::drawing_manager::move(
 
     this->setup_clearing();
 
-    painter.drawRect(
-        src.col * this->cell_size->width(),
-        src.row * this->cell_size->height(),
-        num * this->cell_size->width(),
-        this->cell_size->height());
+    // shifting left
+    if (src.row == dst.row && src.col > dst.col)
+    {
+        painter.drawRect(
+            (dst.col + num) * this->cell_size->width(),
+            src.row * this->cell_size->height(),
+            (src.col - dst.col) * this->cell_size->width(),
+            this->cell_size->height());
+    }
+    else
+    {
+        painter.drawRect(
+            src.col * this->cell_size->width(),
+            src.row * this->cell_size->height(),
+            num * this->cell_size->width(),
+            this->cell_size->height());
+    }
 }
 
 void _t::editor::drawing_manager::shift_up(
@@ -161,7 +173,7 @@ void _t::editor::drawing_manager::shift_left(
     this->painter.drawRect(
         (coords.col + num - 1) * this->cell_size->width(),
         coords.row * this->cell_size->height(),
-        this->cell_size->width(),
+        1 * this->cell_size->width(),
         this->cell_size->height());
 }
 

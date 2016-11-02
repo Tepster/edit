@@ -161,7 +161,29 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         this->cursor_deactivate();
 
-        if (this->cursor.coords)
+        if (this->cursor.selection_mode)
+        {
+            this->cursor.selection_mode = false;
+
+            coordinates from, to;
+
+            // selection goes in forward direction
+            if (this->cursor.coords > this->cursor.selection_from)
+            {
+                from = this->cursor.selection_from;
+                to = this->cursor.coords - 1;
+
+                this->cursor.coords = from;
+            }
+            else
+            {
+                from = this->cursor.coords;
+                to = this->cursor.selection_from;
+            }
+
+            this->delete_chars(from, to);
+        }
+        else if (this->cursor.coords)
         {
             this->delete_char(--this->cursor.coords);
         }
@@ -173,7 +195,32 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         this->cursor_deactivate();
 
-        this->delete_char(this->cursor.coords);
+        if (this->cursor.selection_mode)
+        {
+            this->cursor.selection_mode = false;
+
+            coordinates from, to;
+
+            // selection goes in forward direction
+            if (this->cursor.coords > this->cursor.selection_from)
+            {
+                from = this->cursor.selection_from;
+                to = this->cursor.coords - 1;
+
+                this->cursor.coords = from;
+            }
+            else
+            {
+                from = this->cursor.coords;
+                to = this->cursor.selection_from;
+            }
+
+            this->delete_chars(from, to);
+        }
+        else
+        {
+            this->delete_char(this->cursor.coords);
+        }
 
         this->cursor_activate();
     }
@@ -329,6 +376,29 @@ void _t::editor::editor::write(const QString &text)
 {
     this->cursor_deactivate();
 
+    if (this->cursor.selection_mode)
+    {
+        this->cursor.selection_mode = false;
+
+        coordinates from, to;
+
+        // selection goes in forward direction
+        if (this->cursor.coords > this->cursor.selection_from)
+        {
+            from = this->cursor.selection_from;
+            to = this->cursor.coords - 1;
+
+            this->cursor.coords = from;
+        }
+        else
+        {
+            from = this->cursor.coords;
+            to = this->cursor.selection_from;
+        }
+
+        this->delete_chars(from, to);
+    }
+
     for (QChar character : text)
     {
         qint32 line_rest_length = this->active_line().length()
@@ -483,6 +553,58 @@ void _t::editor::editor::delete_char(const coordinates &coords)
             this->text.removeAt(coords.row + 1);
         }
     }
+}
+
+void _t::editor::editor::delete_chars(
+    const coordinates &from,
+    const coordinates &to)
+{
+    // clear all cells in the range
+    this->each_cell(from, to,
+        [&](const coordinates &coords)
+        {
+            this->painter.clear(coords);
+        });
+
+    coordinates after = to + 1;
+
+    // move the rest of the last line to the end of the first one
+    this->painter.move(
+        after,
+        this->text.at(after.row).length() - after.col,
+        from);
+
+    if (from.row != after.row)
+    {
+        // shift up all following lines
+        for (qint32 i = after.row + 1; i < this->text.count(); ++i)
+        {
+            this->painter.move(
+                coordinates(i, 0),
+                this->text.at(i).length(),
+                coordinates(i - (after.row - from.row), 0));
+        }
+
+        // move the rest of the last line to the end of the first one
+        this->text[from.row].chop(this->text.at(from.row).length() - from.col);
+        this->text[from.row] += this->text.at(after.row)
+            .right(this->text.at(after.row).length() - after.col);
+
+        // remove all lines of the range
+        for (qint32 i = from.row; i < after.row; ++i)
+        {
+            this->text.removeAt(from.row + 1);
+        }
+    }
+    else
+    {
+        // remove the range from the line
+        this->text[from.row] = this->text.at(from.row).left(from.col)
+            + this->text.at(from.row)
+                .right(this->text.at(from.row).length() - after.col);
+    }
+
+    this->update();
 }
 
 

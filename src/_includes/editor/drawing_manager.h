@@ -145,8 +145,7 @@ public:
 
 
     /**
-     * Moves the area to destination and clears the source.
-     * Source and destination areas must not overlap.
+     * Moves the area to destination.
      *
      * @param const _t::editor::coordinates & src
      * @param       qint32                    num

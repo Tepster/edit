@@ -159,6 +159,15 @@ class _t::editor::editor : public QWidget
      */
     void delete_char(const coordinates &coords);
 
+    /**
+     * Deletes the characters in the specified range.
+     * Ranges must be in ascending order.
+     *
+     * @param const _t::editor::coordinates & from
+     * @param const _t::editor::coordinates & to
+     */
+    void delete_chars(const coordinates &from, const coordinates &to);
+
 
     /**
      * Apply selected-cell style to the cell.
