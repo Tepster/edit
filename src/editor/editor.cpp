@@ -3,16 +3,13 @@
 #include <QApplication>
 #include <QClipboard>
 
+#include <QGridLayout>
+
 #include <QChar>
 
 
-void _t::editor::editor::init(QWidget *parent_widget)
+_t::editor::editor::editor()
 {
-    this->setParent(parent_widget);
-
-    // todo: start maximized
-    this->resize(1280, 720);
-
     this->cursor_timer.setParent(this);
     connect(
         &this->cursor_timer,
@@ -21,8 +18,6 @@ void _t::editor::editor::init(QWidget *parent_widget)
         SLOT(cursor_timer_tick()));
     this->cursor_timer.setInterval(500);
 
-    this->area.setParent(this);
-    this->area.resize(this->width(), this->height());
     connect(
         &this->area,
         SIGNAL(mouse_pressed(QMouseEvent *)),
@@ -36,28 +31,35 @@ void _t::editor::editor::init(QWidget *parent_widget)
         this,
         SLOT(mouse_move(QMouseEvent *)));
 
-    // todo: same size as 'this'
-    this->canvas = QPixmap(1280, 720);
 
-    this->cell_size = QSize(9, 18);
+    this->cell_size = QSize(10, 20);
     this->selection_background = QColor(100, 100, 110);
 
-    this->painter.init(
-        &this->canvas,
-        QColor(60, 60, 65),
-        QFont("Consolas", 12),
-        QColor(250, 250, 250),
-        &this->cell_size);
 
-    this->setCursor(Qt::IBeamCursor);
-
-    this->update();
+    this->area.setCursor(Qt::IBeamCursor);
 
     this->text << "";
 
     this->cursor.coords.set_text(&this->text);
 
-    this->setFocus();
+    this->canvas = QPixmap(this->size());
+
+    this->painter.init(
+        QColor(60, 60, 65),
+        QFont("Consolas", 12),
+        QColor(250, 250, 250),
+        &this->cell_size,
+        &this->canvas);
+
+
+    QGridLayout *layout = new QGridLayout;
+    layout->setMargin(0);
+
+    layout->addWidget(&this->area);
+
+    this->setLayout(layout);
+
+    this->setFocusPolicy(Qt::StrongFocus);
 }
 
 
@@ -369,6 +371,24 @@ void _t::editor::editor::focusInEvent(QFocusEvent *)
 void _t::editor::editor::focusOutEvent(QFocusEvent *)
 {
     this->cursor_deactivate();
+}
+
+void _t::editor::editor::resizeEvent(QResizeEvent *)
+{
+    this->cursor_deactivate();
+
+    this->painter.end();
+
+    QPixmap tmp(this->canvas);
+
+    // is this safe? won't the address ever change?
+    this->canvas = QPixmap(this->size());
+    this->painter.init_canvas(&this->canvas);
+    this->painter.draw_pixmap(tmp);
+
+    this->area.resize(this->size());
+
+    this->cursor_activate();
 }
 
 

@@ -2,21 +2,38 @@
 
 
 void _t::editor::drawing_manager::init(
-    QPixmap *canvas,
     const QColor &background,
     const QFont &font,
     const QColor &font_color,
-    QSize *cell_size)
+    QSize *cell_size,
+    QPixmap *canvas)
 {
-    this->canvas = canvas;
     this->background = background;
     this->font = font;
     this->font_color = font_color;
     this->cell_size = cell_size;
 
+    if (canvas)
+    {
+        this->init_canvas(canvas);
+    }
+}
+
+void _t::editor::drawing_manager::init_canvas(QPixmap *canvas)
+{
+    this->canvas = canvas;
+
     this->canvas->fill(this->background);
 
     painter.begin(this->canvas);
+}
+
+void _t::editor::drawing_manager::end()
+{
+    if (this->painter.isActive())
+    {
+        this->painter.end();
+    }
 }
 
 
@@ -49,7 +66,7 @@ void _t::editor::drawing_manager::draw_char(
         coords.row * this->cell_size->height(),
         this->cell_size->width(),
         this->cell_size->height(),
-        0,
+        Qt::AlignCenter,
         character);
 }
 
@@ -83,6 +100,11 @@ void _t::editor::drawing_manager::draw_pixmap(
         this->cell_size->width(),
         this->cell_size->height(),
         pixmap);
+}
+
+void _t::editor::drawing_manager::draw_pixmap(const QPixmap &pixmap)
+{
+    this->painter.drawPixmap(0, 0, pixmap);
 }
 
 

@@ -90,18 +90,30 @@ public:
     /**
      * Main initializer of default values.
      *
-     * @param       QPixmap * canvas
      * @param const QColor  & background
      * @param const QFont   & font
      * @param const QColor  & font_color
      * @param       QSize   * cell_size
+     * @param       QPixmap * canvas
      */
     void init(
-        QPixmap *canvas,
         const QColor &background,
         const QFont &font,
         const QColor &font_color,
-        QSize *cell_size);
+        QSize *cell_size,
+        QPixmap *canvas = 0);
+
+    /**
+     * Initializes the canvas.
+     *
+     * @param QPixmap * canvas
+     */
+    void init_canvas(QPixmap *canvas);
+
+    /**
+     * Ends the painter.
+     */
+    void end();
 
 
     /**
@@ -142,6 +154,13 @@ public:
     void draw_pixmap(
         const _t::editor::coordinates &coords,
         const QPixmap &pixmap);
+
+    /**
+     * Draws the pixmap to the top-left corner.
+     *
+     * @param const QPixmap & pixmap
+     */
+    void draw_pixmap(const QPixmap &pixmap);
 
 
     /**

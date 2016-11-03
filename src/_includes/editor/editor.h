@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QFocusEvent>
+#include <QResizeEvent>
 
 #include <QTimer>
 
@@ -135,6 +136,13 @@ class _t::editor::editor : public QWidget
      */
     void focusOutEvent(QFocusEvent *event);
 
+    /**
+     * Handles resize event.
+     *
+     * @param QResizeEvent * event
+     */
+    void resizeEvent(QResizeEvent *event);
+
 
 
     /**
@@ -256,11 +264,9 @@ private slots:
 
 public:
     /**
-     * Initializes the editor with default values, attaches self to the parent.
-     *
-     * @param QWidget * parent_widget
+     * The main constructor.
      */
-    void init(QWidget *parent_widget);
+    editor();
 
 
     /**
