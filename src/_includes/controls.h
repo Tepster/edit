@@ -26,6 +26,11 @@ class _t::controls::label : public QLabel
     /**
      * @param QMouseEvent * event
      */
+    void mouseReleaseEvent(QMouseEvent *event);
+
+    /**
+     * @param QMouseEvent * event
+     */
     void mouseMoveEvent(QMouseEvent *event);
 
 signals:
@@ -33,6 +38,11 @@ signals:
      * @param QMouseEvent * event
      */
     void mouse_pressed(QMouseEvent *event);
+
+    /**
+     * @param QMouseEvent * event
+     */
+    void mouse_released(QMouseEvent *event);
 
     /**
      * @param QMouseEvent * event
