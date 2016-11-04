@@ -1,4 +1,4 @@
-#include "controls.h"
+#include "controls/label.h"
 
 
 void _t::controls::label::mousePressEvent(QMouseEvent *event)

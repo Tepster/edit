@@ -1,5 +1,5 @@
-#ifndef _T_CONTROLS_H
-#define _T_CONTROLS_H
+#ifndef _T_CONTROLS_LABEL_H
+#define _T_CONTROLS_LABEL_H
 
 #include <QLabel>
 
@@ -50,4 +50,4 @@ signals:
     void mouse_moved(QMouseEvent *event);
 };
 
-#endif // _T_CONTROLS_H
+#endif // _T_CONTROLS_LABEL_H
