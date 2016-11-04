@@ -37,17 +37,17 @@ signals:
     /**
      * @param QMouseEvent * event
      */
-    void mouse_pressed(QMouseEvent *event);
+    void mouse_press_event(QMouseEvent *event);
 
     /**
      * @param QMouseEvent * event
      */
-    void mouse_released(QMouseEvent *event);
+    void mouse_release_event(QMouseEvent *event);
 
     /**
      * @param QMouseEvent * event
      */
-    void mouse_moved(QMouseEvent *event);
+    void mouse_move_event(QMouseEvent *event);
 };
 
 #endif // _T_CONTROLS_LABEL_H
