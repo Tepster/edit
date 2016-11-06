@@ -76,8 +76,53 @@ _t::editor::editor::editor()
 
 void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 {
+    if (event->modifiers() == Qt::ControlModifier)
+    {
+        switch (event->key())
+        {
+        case Qt::Key_C:
+            if (this->cursor.selection_mode)
+            {
+                QString text;
+
+                coordinates begin;
+                coordinates end;
+
+                if (this->cursor.selection_from < this->cursor.coords)
+                {
+                    begin = this->cursor.selection_from;
+                    end = this->cursor.coords - 1;
+                }
+                else
+                {
+                    begin = this->cursor.coords;
+                    end = this->cursor.selection_from;
+                }
+
+                this->each_cell(begin, end, [&](const coordinates &coords)
+                {
+                    if (this->text[coords.row].length() > coords.col)
+                    {
+                        text += this->text[coords.row][coords.col];
+                    }
+                    else
+                    {
+                        text += this->newline_character;
+                    }
+                });
+
+                QApplication::clipboard()->setText(text);
+            }
+            break;
+
+        case Qt::Key_V:
+            this->write(QApplication::clipboard()->text());
+            break;
+        }
+    }
+
     // home, end, left, up, right, down, pageup, pagedown
-    if (event->key() >= 0x01000010 && event->key() <= 0x01000017)
+    else if (event->key() >= 0x01000010 && event->key() <= 0x01000017)
     {
         this->cursor_deactivate();
 
@@ -245,61 +290,6 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     else if (event->key() == Qt::Key_Tab)
     {
         this->write("    ");
-    }
-
-    else if (event->key() == Qt::Key_C)
-    {
-        if (event->modifiers() == Qt::ControlModifier)
-        {
-            if (this->cursor.selection_mode)
-            {
-                QString text;
-
-                coordinates begin;
-                coordinates end;
-
-                if (this->cursor.selection_from < this->cursor.coords)
-                {
-                    begin = this->cursor.selection_from;
-                    end = this->cursor.coords - 1;
-                }
-                else
-                {
-                    begin = this->cursor.coords;
-                    end = this->cursor.selection_from;
-                }
-
-                this->each_cell(begin, end, [&](const coordinates &coords)
-                {
-                    if (this->text[coords.row].length() > coords.col)
-                    {
-                        text += this->text[coords.row][coords.col];
-                    }
-                    else
-                    {
-                        text += this->newline_character;
-                    }
-                });
-
-                QApplication::clipboard()->setText(text);
-            }
-        }
-        else
-        {
-            this->write(event->text());
-        }
-    }
-
-    else if (event->key() == Qt::Key_V)
-    {
-        if (event->modifiers() == Qt::ControlModifier)
-        {
-            this->write(QApplication::clipboard()->text());
-        }
-        else
-        {
-            this->write(event->text());
-        }
     }
 
     else if (event->key() == Qt::Key_Escape)
