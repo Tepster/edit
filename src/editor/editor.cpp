@@ -13,6 +13,9 @@
 
 _t::editor::editor::editor()
 {
+    this->vscrollbar = new _t::editor::vscrollbar(this->shift.ry());
+
+
     this->cursor_timer.setParent(this);
     connect(
         &this->cursor_timer,
@@ -35,15 +38,17 @@ _t::editor::editor::editor()
         SLOT(mouse_moved(QMouseEvent *)));
 
     connect(
-        &this->vscrollbar,
-        SIGNAL(scroll_event(qreal)),
+        this->vscrollbar,
+        SIGNAL(scroll_event()),
         this,
-        SLOT(vscrolled(qreal)));
+        SLOT(vscrolled()));
 
 
     this->cell_size = QSize(10, 20);
     this->selection_background = QColor(80, 80, 90);
 
+
+    this->vscrollbar->area_size_changed(this->cell_size.height());
 
     this->area.setCursor(Qt::IBeamCursor);
 
@@ -66,7 +71,7 @@ _t::editor::editor::editor()
     layout->setSpacing(0);
 
     layout->addWidget(&this->area, 0, 0);
-    layout->addWidget(&this->vscrollbar, 0, 1);
+    layout->addWidget(this->vscrollbar, 0, 1);
 
     this->setLayout(layout);
 
@@ -261,7 +266,10 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->delete_char(--this->cursor.coords);
         }
 
+        this->vscrollbar->area_size_changed(
+            this->text.count() * this->cell_size.height());
         this->scroll_to_cursor();
+        this->safe_scroll_end();
 
         this->cursor_activate();
     }
@@ -297,7 +305,10 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->delete_char(this->cursor.coords);
         }
 
+        this->vscrollbar->area_size_changed(
+            this->text.count() * this->cell_size.height());
         this->scroll_to_cursor();
+        this->safe_scroll_end();
 
         this->cursor_activate();
     }
@@ -327,9 +338,7 @@ void _t::editor::editor::wheelEvent(QWheelEvent *event)
     qreal target_shift_px = qreal(this->shift.y()) - qreal(event->delta()) / 30
         * this->cell_size.height();
 
-    qreal text_height = (this->text.count() - 1) * this->cell_size.height();
-
-    this->vscrollbar.scroll(target_shift_px / text_height);
+    this->vscrollbar->scroll(target_shift_px);
 }
 
 void _t::editor::editor::mouse_pressed(QMouseEvent *event)
@@ -417,20 +426,20 @@ void _t::editor::editor::resizeEvent(QResizeEvent *)
     this->painter.end();
 
     this->canvas = QPixmap(
-        this->width() - this->vscrollbar.width(),
+        this->width() - this->vscrollbar->width(),
         this->height());
+
     this->painter.init_canvas(&this->canvas);
+    this->area.resize(this->canvas.size());
     this->redraw();
 
-    this->area.resize(this->canvas.size());
+    this->safe_scroll_end();
 
     this->cursor_activate();
 }
 
-void _t::editor::editor::vscrolled(qreal shift)
+void _t::editor::editor::vscrolled()
 {
-    this->shift.setY((this->text.count() - 1) * this->cell_size.height() * shift);
-
     this->redraw();
 }
 
@@ -527,6 +536,9 @@ void _t::editor::editor::write(const QString &text)
             ++this->cursor.col();
         }
     }
+
+    this->vscrollbar->area_size_changed(
+        this->text.count() * this->cell_size.height());
 
     this->scroll_to_cursor();
 
@@ -947,22 +959,26 @@ void _t::editor::editor::scroll_to_cursor()
     // cursor above the viewport
     if (this->cursor.row() * this->cell_size.height() < this->shift.y())
     {
-        qreal cursor_y = this->cursor.row() * this->cell_size.height();
-        qreal text_height = (this->text.count() - 1) * this->cell_size.height();
-
-        this->vscrollbar.scroll(cursor_y / text_height);
+        this->vscrollbar->scroll(this->cursor.row() * this->cell_size.height());
     }
 
     // cursor below the viewport
     else if ((this->cursor.row() + 1) * this->cell_size.height()
         > this->area.height() + this->shift.y())
     {
-        qreal cursor_y = this->cursor.row() * this->cell_size.height();
-        qreal target_y = cursor_y - this->area.height() + this->cell_size.height();
+        this->vscrollbar->scroll((this->cursor.row() + 1)
+                * this->cell_size.height() - this->area.height());
+    }
+}
 
-        qreal text_height = (this->text.count() - 1) * this->cell_size.height();
+void _t::editor::editor::safe_scroll_end()
+{
+    qint32 text_height = this->text.count() * this->cell_size.height();
 
-        this->vscrollbar.scroll(target_y / text_height);
+    if (text_height >= this->area.height()
+        && text_height < this->area.height() + this->shift.y())
+    {
+        this->vscrollbar->scroll(text_height - this->area.height());
     }
 }
 

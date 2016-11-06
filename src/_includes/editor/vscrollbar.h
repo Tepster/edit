@@ -36,6 +36,11 @@ class _t::editor::vscrollbar : public _t::editor::scrollbar
      */
     void init_coords(QPoint coords);
 
+    /**
+     * Refreshes the size and position of the slider.
+     */
+    void refresh();
+
 private slots:
     /**
      * Mouse moved on the slider.
@@ -48,7 +53,7 @@ public:
     /**
      * The main constructor.
      */
-    vscrollbar();
+    vscrollbar(qint32 &shift);
 
 
     /**

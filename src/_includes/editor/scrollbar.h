@@ -47,12 +47,22 @@ protected:
 
 
     /**
+     * @var qint32 & shift
+     */
+    qint32 &shift;
+
+    /**
+     * @var qint32 area_size
+     */
+    qint32 area_size;
+
+
+    /**
      * Initializes the coordinates values.
      *
      * @param QPoint coords
      */
     virtual void init_coords(QPoint coords) = 0;
-
 
     /**
      * Paints the scrollbar color style.
@@ -60,6 +70,12 @@ protected:
      * @param QPaintEvent * event
      */
     void paintEvent(QPaintEvent *event);
+
+
+    /**
+     * Refreshes the size and position of the slider.
+     */
+    virtual void refresh() = 0;
 
 protected slots:
     /**
@@ -83,11 +99,19 @@ protected slots:
      */
     virtual void slider_moved(QMouseEvent *event) = 0;
 
+public slots:
+    /**
+     * Scrollarea size changed.
+     *
+     * @param qint32 size
+     */
+    void area_size_changed(qint32 size);
+
 public:
     /**
      * Tha main constructor.
      */
-    scrollbar();
+    scrollbar(qint32 &shift);
 
 
     /**
@@ -101,7 +125,7 @@ signals:
     /**
      * @param qreal shift
      */
-    void scroll_event(qreal shift);
+    void scroll_event();
 };
 
 #endif // _T_EDITOR_SCROLLBAR_H

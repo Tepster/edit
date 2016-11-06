@@ -5,7 +5,8 @@
 #include <QColor>
 
 
-_t::editor::scrollbar::scrollbar()
+_t::editor::scrollbar::scrollbar(qint32 &shift)
+    : shift(shift)
 {
     this->slider.setParent(this);
     this->slider.setStyleSheet("background: rgb(35, 35, 45)");
@@ -47,4 +48,12 @@ void _t::editor::scrollbar::slider_pressed(QMouseEvent *event)
 void _t::editor::scrollbar::slider_released(QMouseEvent *)
 {
     this->scrolling = false;
+}
+
+
+void _t::editor::scrollbar::area_size_changed(qint32 size)
+{
+    this->area_size = size;
+
+    this->refresh();
 }

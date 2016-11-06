@@ -64,9 +64,9 @@ class _t::editor::editor : public QWidget
     /**
      * The vertical scrollbar.
      *
-     * @var _t::editor::vscrollbar vscrollbar
+     * @var _t::editor::vscrollbar * vscrollbar
      */
-    _t::editor::vscrollbar vscrollbar;
+    _t::editor::vscrollbar *vscrollbar;
 
 
     /**
@@ -241,6 +241,11 @@ class _t::editor::editor : public QWidget
      */
     void scroll_to_cursor();
 
+    /**
+     * Scrolls to the end of the viewport if the text area ends above.
+     */
+    void safe_scroll_end();
+
 
     /**
      * Displays the cursor on the editor canvas.
@@ -300,10 +305,8 @@ private slots:
 
     /**
      * Handles shifting the text after vertical scroll.
-     *
-     * @param qreal shift
      */
-    void vscrolled(qreal shift);
+    void vscrolled();
 
 public:
     /**
