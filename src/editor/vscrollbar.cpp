@@ -11,7 +11,7 @@ _t::editor::vscrollbar::vscrollbar(qint32 &shift)
 
 void _t::editor::vscrollbar::scroll(qreal shift)
 {
-    if (shift < 0)
+    if (shift < 0 || this->height() >= this->area_size)
     {
         shift = 0;
     }

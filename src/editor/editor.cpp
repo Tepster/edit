@@ -266,6 +266,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->delete_char(--this->cursor.coords);
         }
 
+        this->redraw();
         this->vscrollbar->area_size_changed(
             this->text.count() * this->cell_size.height());
         this->scroll_to_cursor();
@@ -305,6 +306,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->delete_char(this->cursor.coords);
         }
 
+        this->redraw();
         this->vscrollbar->area_size_changed(
             this->text.count() * this->cell_size.height());
         this->scroll_to_cursor();
