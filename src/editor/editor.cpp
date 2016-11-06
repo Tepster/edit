@@ -80,6 +80,21 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         switch (event->key())
         {
+        case Qt::Key_A:
+            this->cursor_deactivate();
+
+            this->cursor.selection_mode = false;
+            this->cursor.coords = coordinates(0, 0);
+
+            this->cursor_move(
+                coordinates(
+                    this->text.count() - 1,
+                    this->text.at(this->text.count() - 1).length()),
+                true);
+
+            this->cursor_activate();
+            break;
+
         case Qt::Key_C:
             if (this->cursor.selection_mode)
             {
