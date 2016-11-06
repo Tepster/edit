@@ -6,12 +6,14 @@ void _t::editor::drawing_manager::init(
     const QFont &font,
     const QColor &font_color,
     QSize *cell_size,
+    const QPoint *shift,
     QPixmap *canvas)
 {
     this->background = background;
     this->font = font;
     this->font_color = font_color;
     this->cell_size = cell_size;
+    this->shift = shift;
 
     if (canvas)
     {
@@ -62,8 +64,8 @@ void _t::editor::drawing_manager::draw_char(
     this->setup_writing();
 
     this->painter.drawText(
-        coords.col * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        coords.col * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         this->cell_size->width(),
         this->cell_size->height(),
         Qt::AlignCenter,
@@ -83,8 +85,8 @@ void _t::editor::drawing_manager::draw_char(
 void _t::editor::drawing_manager::draw_cursor(const coordinates &coords)
 {
     this->painter.fillRect(
-        coords.col * this->cell_size->width(),
-        coords.row *  this->cell_size->height(),
+        coords.col * this->cell_size->width() - this->shift->x(),
+        coords.row *  this->cell_size->height() - this->shift->y(),
         2,
         this->cell_size->height(),
         QColor(50, 170, 110));
@@ -95,8 +97,8 @@ void _t::editor::drawing_manager::draw_pixmap(
     const QPixmap &pixmap)
 {
     this->painter.drawPixmap(
-        coords.col * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        coords.col * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         this->cell_size->width(),
         this->cell_size->height(),
         pixmap);
@@ -119,11 +121,11 @@ void _t::editor::drawing_manager::move(
     }
 
     this->painter.drawPixmap(
-        dst.col * this->cell_size->width(),
-        dst.row * this->cell_size->height(),
+        dst.col * this->cell_size->width() - this->shift->x(),
+        dst.row * this->cell_size->height() - this->shift->y(),
         *this->canvas,
-        src.col * this->cell_size->width(),
-        src.row * this->cell_size->height(),
+        src.col * this->cell_size->width() - this->shift->x(),
+        src.row * this->cell_size->height() - this->shift->y(),
         num * this->cell_size->width(),
         this->cell_size->height());
 
@@ -133,16 +135,16 @@ void _t::editor::drawing_manager::move(
     if (src.row == dst.row && src.col > dst.col)
     {
         painter.drawRect(
-            (dst.col + num) * this->cell_size->width(),
-            src.row * this->cell_size->height(),
+            (dst.col + num) * this->cell_size->width() - this->shift->x(),
+            src.row * this->cell_size->height() - this->shift->y(),
             (src.col - dst.col) * this->cell_size->width(),
             this->cell_size->height());
     }
     else
     {
         painter.drawRect(
-            src.col * this->cell_size->width(),
-            src.row * this->cell_size->height(),
+            src.col * this->cell_size->width() - this->shift->x(),
+            src.row * this->cell_size->height() - this->shift->y(),
             num * this->cell_size->width(),
             this->cell_size->height());
     }
@@ -182,19 +184,19 @@ void _t::editor::drawing_manager::shift_left(
     }
 
     this->painter.drawPixmap(
-        (coords.col - 1) * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        (coords.col - 1) * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         *this->canvas,
-        coords.col * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        coords.col * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         num * this->cell_size->width(),
         this->cell_size->height());
 
     this->setup_clearing();
 
     this->painter.drawRect(
-        (coords.col + num - 1) * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        (coords.col + num - 1) * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         1 * this->cell_size->width(),
         this->cell_size->height());
 }
@@ -209,19 +211,19 @@ void _t::editor::drawing_manager::shift_right(
     }
 
     this->painter.drawPixmap(
-        (coords.col + 1) * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        (coords.col + 1) * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         *this->canvas,
-        coords.col * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        coords.col * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         num * this->cell_size->width(),
         this->cell_size->height());
 
     this->setup_clearing();
 
     this->painter.drawRect(
-        coords.col * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        coords.col * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         this->cell_size->width(),
         this->cell_size->height());
 }
@@ -239,8 +241,8 @@ void _t::editor::drawing_manager::clear(
     this->setup_clearing(color);
 
     this->painter.drawRect(
-        coords.col * this->cell_size->width(),
-        coords.row * this->cell_size->height(),
+        coords.col * this->cell_size->width() - this->shift->x(),
+        coords.row * this->cell_size->height() - this->shift->y(),
         this->cell_size->width(),
         this->cell_size->height());
 }

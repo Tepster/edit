@@ -8,6 +8,7 @@
 
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QFocusEvent>
 #include <QResizeEvent>
 
@@ -18,13 +19,15 @@
 #include <QStringList>
 
 #include <QColor>
+#include <QPoint>
 #include <QSize>
 
-#include "controls.h"
+#include "controls/label.h"
 
 #include "editor/coordinates.h"
 #include "editor/cursor.h"
 #include "editor/drawing_manager.h"
+#include "editor/vscrollbar.h"
 
 
 namespace _t
@@ -50,6 +53,21 @@ class _t::editor::editor : public QWidget
      * @var _t::controls::label area
      */
     controls::label area;
+
+    /**
+     * Text shift according to scrollbars.
+     *
+     * @var QPoint shift
+     */
+    QPoint shift = QPoint(0, 0);
+
+    /**
+     * The vertical scrollbar.
+     *
+     * @var _t::editor::vscrollbar vscrollbar
+     */
+    _t::editor::vscrollbar vscrollbar;
+
 
     /**
      * Tha canvas for painting the text.
@@ -123,6 +141,13 @@ class _t::editor::editor : public QWidget
     void keyPressEvent(QKeyEvent *event);
 
     /**
+     * Handles wheel event.
+     *
+     * @param QWheelEvent * event
+     */
+    void wheelEvent(QWheelEvent *event);
+
+    /**
      * Handles focus-in event.
      *
      * @param QFocusEvent * event
@@ -158,6 +183,11 @@ class _t::editor::editor : public QWidget
      * Deselect all selected cells.
      */
     void deselect();
+
+    /**
+     * Redraws everything.
+     */
+    void redraw();
 
 
     /**
@@ -205,6 +235,11 @@ class _t::editor::editor : public QWidget
      * @param bool                      selection
      */
     void cursor_move(const coordinates &coords, bool selection = false);
+
+    /**
+     * Scrolls to the cursor, if not already in the viewport.
+     */
+    void scroll_to_cursor();
 
 
     /**
@@ -261,6 +296,14 @@ private slots:
      * Handles showing/hiding cursor when blinking.
      */
     void cursor_timer_tick();
+
+
+    /**
+     * Handles shifting the text after vertical scroll.
+     *
+     * @param qreal shift
+     */
+    void vscrolled(qreal shift);
 
 public:
     /**

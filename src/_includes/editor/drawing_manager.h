@@ -8,6 +8,7 @@
 
 #include <QFont>
 #include <QColor>
+#include <QPoint>
 #include <QSize>
 
 #include "editor/coordinates.h"
@@ -68,6 +69,8 @@ class _t::editor::drawing_manager
      */
     QSize *cell_size;
 
+    const QPoint *shift;
+
 
     /**
      * Sets-up the painter to clearing mode.
@@ -101,6 +104,7 @@ public:
         const QFont &font,
         const QColor &font_color,
         QSize *cell_size,
+        const QPoint *shift,
         QPixmap *canvas = 0);
 
     /**

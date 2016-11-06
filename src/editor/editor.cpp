@@ -7,6 +7,9 @@
 
 #include <QChar>
 
+#include <QColor>
+#include <QFont>
+
 
 _t::editor::editor::editor()
 {
@@ -20,20 +23,26 @@ _t::editor::editor::editor()
 
     connect(
         &this->area,
-        SIGNAL(mouse_pressed(QMouseEvent *)),
+        SIGNAL(mouse_press_event(QMouseEvent *)),
         this,
         SLOT(mouse_press(QMouseEvent *)));
 
     this->area.setMouseTracking(true);
     connect(
         &this->area,
-        SIGNAL(mouse_moved(QMouseEvent *)),
+        SIGNAL(mouse_move_event(QMouseEvent *)),
         this,
         SLOT(mouse_move(QMouseEvent *)));
 
+    connect(
+        &this->vscrollbar,
+        SIGNAL(scroll_event(qreal)),
+        this,
+        SLOT(vscrolled(qreal)));
+
 
     this->cell_size = QSize(10, 20);
-    this->selection_background = QColor(100, 100, 110);
+    this->selection_background = QColor(80, 80, 90);
 
 
     this->area.setCursor(Qt::IBeamCursor);
@@ -45,17 +54,19 @@ _t::editor::editor::editor()
     this->canvas = QPixmap(this->size());
 
     this->painter.init(
-        QColor(60, 60, 65),
+        QColor(60, 60, 70),
         QFont("Consolas", 12),
         QColor(250, 250, 250),
         &this->cell_size,
+        &this->shift,
         &this->canvas);
-
 
     QGridLayout *layout = new QGridLayout;
     layout->setMargin(0);
+    layout->setSpacing(0);
 
-    layout->addWidget(&this->area);
+    layout->addWidget(&this->area, 0, 0);
+    layout->addWidget(&this->vscrollbar, 0, 1);
 
     this->setLayout(layout);
 
@@ -190,6 +201,8 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->delete_char(--this->cursor.coords);
         }
 
+        this->scroll_to_cursor();
+
         this->cursor_activate();
     }
 
@@ -223,6 +236,8 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
         {
             this->delete_char(this->cursor.coords);
         }
+
+        this->scroll_to_cursor();
 
         this->cursor_activate();
     }
@@ -302,6 +317,16 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void _t::editor::editor::wheelEvent(QWheelEvent *event)
+{
+    qreal target_shift_px = qreal(this->shift.y()) - qreal(event->delta()) / 30
+        * this->cell_size.height();
+
+    qreal text_height = (this->text.count() - 1) * this->cell_size.height();
+
+    this->vscrollbar.scroll(target_shift_px / text_height);
+}
+
 void _t::editor::editor::mouse_press(QMouseEvent *event)
 {
     if (event->buttons() != Qt::LeftButton)
@@ -316,8 +341,12 @@ void _t::editor::editor::mouse_press(QMouseEvent *event)
         this->deselect();
     }
 
-    qint32 row = event->localPos().y() / this->cell_size.height();
-    qint32 col = event->localPos().x() / this->cell_size.width();
+    qint32 row = (event->localPos().y() + this->shift.y())
+        / this->cell_size.height();
+
+    qint32 col = (event->localPos().x() + this->shift.x())
+        / this->cell_size.width();
+
     if ((qint32)event->localPos().x() % this->cell_size.width()
         > this->cell_size.width() / 2)
     {
@@ -340,8 +369,11 @@ void _t::editor::editor::mouse_move(QMouseEvent *event)
 
     this->cursor_deactivate();
 
-    qint32 row = event->localPos().y() / this->cell_size.height();
-    qint32 col = event->localPos().x() / this->cell_size.width();
+    qint32 row = (event->localPos().y() + this->shift.y())
+        / this->cell_size.height();
+
+    qint32 col = (event->localPos().x() + this->shift.x())
+        / this->cell_size.width();
 
     if (row < 0)
     {
@@ -379,16 +411,22 @@ void _t::editor::editor::resizeEvent(QResizeEvent *)
 
     this->painter.end();
 
-    QPixmap tmp(this->canvas);
-
-    // is this safe? won't the address ever change?
-    this->canvas = QPixmap(this->size());
+    this->canvas = QPixmap(
+        this->width() - this->vscrollbar.width(),
+        this->height());
     this->painter.init_canvas(&this->canvas);
-    this->painter.draw_pixmap(tmp);
+    this->redraw();
 
-    this->area.resize(this->size());
+    this->area.resize(this->canvas.size());
 
     this->cursor_activate();
+}
+
+void _t::editor::editor::vscrolled(qreal shift)
+{
+    this->shift.setY((this->text.count() - 1) * this->cell_size.height() * shift);
+
+    this->redraw();
 }
 
 
@@ -485,6 +523,8 @@ void _t::editor::editor::write(const QString &text)
         }
     }
 
+    this->scroll_to_cursor();
+
     this->update();
 
     this->cursor_activate();
@@ -524,6 +564,72 @@ void _t::editor::editor::deselect()
     {
         this->draw_deselected_cell(coords);
     });
+}
+
+void _t::editor::editor::redraw()
+{
+    this->cursor_deactivate();
+
+    this->canvas.fill(QColor(60, 60, 70));
+
+    if (this->text.count() > 1 || this->text.at(0).length() > 0)
+    {
+        coordinates last_cell;
+        if (this->text.at(this->text.count() - 1).length() > 0)
+        {
+            last_cell.set(
+                this->text.count() - 1,
+                this->text.at(this->text.count() - 1).length() - 1);
+        }
+        else
+        {
+            last_cell.set(
+                this->text.count() - 2,
+                this->text.at(this->text.count() - 2).length());
+        }
+
+        this->each_cell(
+            coordinates(0, 0),
+            last_cell,
+            [&](const coordinates &coords)
+            {
+                if (this->text.at(coords.row).length() > coords.col)
+                {
+                    this->painter.draw_char(
+                        coords,
+                        this->text.at(coords.row).at(coords.col));
+                }
+            });
+
+
+        if (this->cursor.selection_mode)
+        {
+            coordinates selection_from, selection_to;
+
+            if (this->cursor.coords > this->cursor.selection_from)
+            {
+                selection_from = this->cursor.selection_from;
+                selection_to = this->cursor.coords - 1;
+            }
+            else
+            {
+                selection_from = this->cursor.coords;
+                selection_to = this->cursor.selection_from;
+            }
+
+            this->each_cell(
+                selection_from,
+                selection_to,
+                [&](const coordinates &coords)
+                {
+                    this->draw_selected_cell(coords);
+                });
+        }
+
+        this->update();
+    }
+
+    this->cursor_activate();
 }
 
 
@@ -827,6 +933,32 @@ void _t::editor::editor::cursor_move(
     }
 
     this->cursor.coords = target_coords;
+
+    this->scroll_to_cursor();
+}
+
+void _t::editor::editor::scroll_to_cursor()
+{
+    // cursor above the viewport
+    if (this->cursor.row() * this->cell_size.height() < this->shift.y())
+    {
+        qreal cursor_y = this->cursor.row() * this->cell_size.height();
+        qreal text_height = (this->text.count() - 1) * this->cell_size.height();
+
+        this->vscrollbar.scroll(cursor_y / text_height);
+    }
+
+    // cursor below the viewport
+    else if ((this->cursor.row() + 1) * this->cell_size.height()
+        > this->area.height() + this->shift.y())
+    {
+        qreal cursor_y = this->cursor.row() * this->cell_size.height();
+        qreal target_y = cursor_y - this->area.height() + this->cell_size.height();
+
+        qreal text_height = (this->text.count() - 1) * this->cell_size.height();
+
+        this->vscrollbar.scroll(target_y / text_height);
+    }
 }
 
 
@@ -835,8 +967,8 @@ void _t::editor::editor::cursor_show()
     if (!this->cursor_visible)
     {
         this->cursor.background = this->canvas.copy(
-            this->cursor.col() * this->cell_size.width(),
-            this->cursor.row() * this->cell_size.height(),
+            this->cursor.col() * this->cell_size.width() - this->shift.x(),
+            this->cursor.row() * this->cell_size.height() - this->shift.y(),
             this->cell_size.width(),
             this->cell_size.height());
 

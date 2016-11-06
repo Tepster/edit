@@ -12,14 +12,18 @@ SOURCES += main.cpp \
     editor/cursor.cpp \
     editor/coordinates.cpp \
     editor/drawing_manager.cpp \
-    editor/editor.cpp
+    editor/editor.cpp \
+    editor/vscrollbar.cpp \
+    editor/scrollbar.cpp
 
 HEADERS  += \
     _includes/main_window.h \
-    _includes/controls.h \
+    _includes/controls/label.h \
     _includes/editor/editor.h \
     _includes/editor/coordinates.h \
     _includes/editor/cursor.h \
-    _includes/editor/drawing_manager.h
+    _includes/editor/drawing_manager.h \
+    _includes/editor/scrollbar.h \
+    _includes/editor/vscrollbar.h
 
 INCLUDEPATH += _includes
