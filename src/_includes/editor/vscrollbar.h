@@ -36,6 +36,14 @@ class _t::editor::vscrollbar : public _t::editor::scrollbar
      */
     void init_coords(QPoint coords);
 
+private slots:
+    /**
+     * Mouse moved on the slider.
+     *
+     * @param QMouseEvent * event
+     */
+    void slider_moved(QMouseEvent *event);
+
 public:
     /**
      * The main constructor.
@@ -49,14 +57,6 @@ public:
      * @param qreal shift
      */
     void scroll(qreal shift);
-
-private slots:
-    /**
-     * Mouse moved on the slider.
-     *
-     * @param QMouseEvent * event
-     */
-    void slider_moved(QMouseEvent *event);
 };
 
 #endif // _T_EDITOR_VSCROLLBAR_H

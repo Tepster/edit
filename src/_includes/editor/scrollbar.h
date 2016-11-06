@@ -61,20 +61,6 @@ protected:
      */
     void paintEvent(QPaintEvent *event);
 
-public:
-    /**
-     * Tha main constructor.
-     */
-    scrollbar();
-
-
-    /**
-     * Moves the slider to position specified by shift.
-     *
-     * @param qreal shift
-     */
-    virtual void scroll(qreal shift) = 0;
-
 protected slots:
     /**
      * Mouse pressed on the slider.
@@ -96,6 +82,20 @@ protected slots:
      * @param QMouseEvent * event
      */
     virtual void slider_moved(QMouseEvent *event) = 0;
+
+public:
+    /**
+     * Tha main constructor.
+     */
+    scrollbar();
+
+
+    /**
+     * Moves the slider to position specified by shift.
+     *
+     * @param qreal shift
+     */
+    virtual void scroll(qreal shift) = 0;
 
 signals:
     /**
