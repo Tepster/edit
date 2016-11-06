@@ -282,20 +282,20 @@ private slots:
      *
      * @param QMouseEvent * event
      */
-    void mouse_press(QMouseEvent *event);
+    void mouse_pressed(QMouseEvent *event);
 
     /**
      * Handles mouse movement.
      *
      * @param QMouseEvent * event
      */
-    void mouse_move(QMouseEvent *event);
+    void mouse_moved(QMouseEvent *event);
 
 
     /**
      * Handles showing/hiding cursor when blinking.
      */
-    void cursor_timer_tick();
+    void cursor_timer_ticked();
 
 
     /**

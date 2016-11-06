@@ -18,21 +18,21 @@ _t::editor::editor::editor()
         &this->cursor_timer,
         SIGNAL(timeout()),
         this,
-        SLOT(cursor_timer_tick()));
+        SLOT(cursor_timer_ticked()));
     this->cursor_timer.setInterval(500);
 
     connect(
         &this->area,
         SIGNAL(mouse_press_event(QMouseEvent *)),
         this,
-        SLOT(mouse_press(QMouseEvent *)));
+        SLOT(mouse_pressed(QMouseEvent *)));
 
     this->area.setMouseTracking(true);
     connect(
         &this->area,
         SIGNAL(mouse_move_event(QMouseEvent *)),
         this,
-        SLOT(mouse_move(QMouseEvent *)));
+        SLOT(mouse_moved(QMouseEvent *)));
 
     connect(
         &this->vscrollbar,
@@ -327,7 +327,7 @@ void _t::editor::editor::wheelEvent(QWheelEvent *event)
     this->vscrollbar.scroll(target_shift_px / text_height);
 }
 
-void _t::editor::editor::mouse_press(QMouseEvent *event)
+void _t::editor::editor::mouse_pressed(QMouseEvent *event)
 {
     if (event->buttons() != Qt::LeftButton)
     {
@@ -360,7 +360,7 @@ void _t::editor::editor::mouse_press(QMouseEvent *event)
     this->cursor_activate();
 }
 
-void _t::editor::editor::mouse_move(QMouseEvent *event)
+void _t::editor::editor::mouse_moved(QMouseEvent *event)
 {
     if (event->buttons() != Qt::LeftButton)
     {
@@ -1009,7 +1009,7 @@ void _t::editor::editor::cursor_deactivate()
 }
 
 
-void _t::editor::editor::cursor_timer_tick()
+void _t::editor::editor::cursor_timer_ticked()
 {
     if (this->cursor_visible)
     {
