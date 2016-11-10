@@ -17,6 +17,9 @@ namespace _t
     }
 }
 
+/**
+ * The _t::editor::vscrollbar representing the vertical scrollbar of the editor.
+ */
 class _t::editor::vscrollbar : public _t::editor::scrollbar
 {
     Q_OBJECT
@@ -29,17 +32,23 @@ class _t::editor::vscrollbar : public _t::editor::scrollbar
      */
     void resizeEvent(QResizeEvent *event);
 
+
     /**
-     * Initializes the coordinates values.
+     * Initializes the y-coordinates before slider-scrolling.
      *
      * @param QPoint coords
      */
-    void init_coords(QPoint coords);
+    void scroll_init_coords(QPoint coords) override;
+
+    /**
+     * Correct the shift within boundaries, scrolls eventually.
+     */
+    void correct_scroll();
 
     /**
      * Refreshes the size and position of the slider.
      */
-    void refresh();
+    void refresh() override;
 
 private slots:
     /**
@@ -47,11 +56,21 @@ private slots:
      *
      * @param QMouseEvent * event
      */
-    void slider_moved(QMouseEvent *event);
+    void slider_moved(QMouseEvent *event) override;
+
+public slots:
+    /**
+     * Changes the local area_size field and refreshes.
+     *
+     * @param qint32 height
+     */
+    void area_size_changed(qint32 height) override;
 
 public:
     /**
      * The main constructor.
+     *
+     * @param qint32 & shift
      */
     vscrollbar(qint32 &shift);
 
@@ -59,9 +78,9 @@ public:
     /**
      * Moves the slider to position specified by shift.
      *
-     * @param qreal shift
+     * @param qint32 shift
      */
-    void scroll(qreal shift);
+    void scroll(qint32 shift) override;
 };
 
 #endif // _T_EDITOR_VSCROLLBAR_H

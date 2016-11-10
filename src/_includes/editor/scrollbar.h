@@ -19,6 +19,19 @@ namespace _t
     }
 }
 
+/**
+ * The _t::editor::scrollbar abstract class as a base for vertical
+ * and horizontal scrollbars.
+ *
+ * - it should behave like a standalone control
+ * - it stores the shift into the given reference, because it is also needed
+ *   elsewhere
+ * - slider size and position is being deterined by the shift,
+ *   scrollbar size and the area_size, which is updated via the method calling
+ *   from the parent editor
+ * - when scrolls, it fires the event so parent editor can redraw
+ *   according to the new shift
+ */
 class _t::editor::scrollbar : public QWidget
 {
     Q_OBJECT
@@ -58,19 +71,19 @@ protected:
 
 
     /**
-     * Initializes the coordinates values.
-     *
-     * @param QPoint coords
-     */
-    virtual void init_coords(QPoint coords) = 0;
-
-    /**
      * Paints the scrollbar color style.
      *
      * @param QPaintEvent * event
      */
     void paintEvent(QPaintEvent *event);
 
+
+    /**
+     * Initializes the coordinates values before slider-scrolling.
+     *
+     * @param QPoint coords
+     */
+    virtual void scroll_init_coords(QPoint coords) = 0;
 
     /**
      * Refreshes the size and position of the slider.
@@ -101,29 +114,32 @@ protected slots:
 
 public slots:
     /**
-     * Scrollarea size changed.
+     * Changes the local area_size field and refreshes.
      *
-     * @param qint32 size
+     * @param qint32
      */
-    void area_size_changed(qint32 size);
+    virtual void area_size_changed(qint32) = 0;
 
 public:
     /**
-     * Tha main constructor.
+     * The main constructor.
+     *
+     * @param qint32 & shift
      */
     scrollbar(qint32 &shift);
 
 
     /**
-     * Moves the slider to position specified by shift.
+     * Validates and moves the slider to position specified by shift
+     * and fires the scroll_event.
      *
-     * @param qreal shift
+     * @param qint32 shift
      */
-    virtual void scroll(qreal shift) = 0;
+    virtual void scroll(qint32 shift) = 0;
 
 signals:
     /**
-     * @param qreal shift
+     * Event fired after slider-scroll or manual-scroll.
      */
     void scroll_event();
 };

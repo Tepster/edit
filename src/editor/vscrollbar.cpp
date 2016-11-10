@@ -9,14 +9,19 @@ _t::editor::vscrollbar::vscrollbar(qint32 &shift)
     this->refresh();
 }
 
-void _t::editor::vscrollbar::scroll(qreal shift)
+
+void _t::editor::vscrollbar::scroll(qint32 shift)
 {
-    if (shift < 0 || this->height() >= this->area_size)
+    // should scroll to negative OR text area height smaller than the editor
+    if (shift < 0 || this->area_size <= this->height())
     {
         shift = 0;
     }
-    else if (shift > this->area_size - this->height())
+
+    // end of the text area ends above the end of the editor
+    else if (shift + this->height() > this->area_size)
     {
+        // set shift so the text area ends same as the editor
         shift = this->area_size - this->height();
     }
 
@@ -31,15 +36,39 @@ void _t::editor::vscrollbar::scroll(qreal shift)
 }
 
 
-void _t::editor::vscrollbar::resizeEvent(QResizeEvent *)
+void _t::editor::vscrollbar::area_size_changed(qint32 height)
 {
-    this->refresh();
+    // only proceed if there is a change
+    if (this->area_size != height)
+    {
+        this->area_size = height;
+        this->correct_scroll();
+
+        this->refresh();
+    }
 }
 
-void _t::editor::vscrollbar::init_coords(QPoint coords)
+
+void _t::editor::vscrollbar::resizeEvent(QResizeEvent *event)
+{
+    // the size changed vertically
+    if (event->size().height() != event->oldSize().height())
+    {
+        this->correct_scroll();
+        this->refresh();
+    }
+}
+
+
+void _t::editor::vscrollbar::scroll_init_coords(QPoint coords)
 {
     this->slider_original_coord = this->slider.y();
     this->slider_press_coord = coords.y();
+}
+
+void _t::editor::vscrollbar::correct_scroll()
+{
+    this->scroll(this->shift);
 }
 
 void _t::editor::vscrollbar::refresh()
@@ -47,16 +76,26 @@ void _t::editor::vscrollbar::refresh()
     qint32 slider_height;
     qint32 slider_y;
 
-    if (this->area_size - this->height())
+    // text area is smaller than the editor - slider is full-size
+    if (this->area_size <= this->height())
     {
-        slider_height = std::pow(this->height(), 2) / this->area_size;
-        slider_y = ((this->height() - slider_height) * this->shift)
-            / (this->area_size - this->height());
+        slider_height = this->height();
+        slider_y = 0;
     }
     else
     {
-        slider_height = this->area_size;
-        slider_y = 0;
+        // no need for checking division by zero - is checked in condition above
+        slider_height = std::pow(this->height(), 2) / this->area_size;
+
+        // set minimal height of slider
+        if (slider_height < this->height() / 10)
+        {
+            slider_height = this->height() / 10;
+        }
+
+        // no need for checking division by zero - is checked in condition above
+        slider_y = ((this->height() - slider_height) * this->shift)
+            / (this->area_size - this->height());
     }
 
     this->slider.resize(this->slider.width(), slider_height);
@@ -66,28 +105,13 @@ void _t::editor::vscrollbar::refresh()
 
 void _t::editor::vscrollbar::slider_moved(QMouseEvent *event)
 {
-    if (this->scrolling)
+    // in scrolling mode AND slider is not full-height
+    if (this->scrolling && this->height() != this->slider.height())
     {
         qint32 target_y = this->slider_original_coord + event->globalY()
             - this->slider_press_coord;
 
-        if (target_y < 0)
-        {
-            target_y = 0;
-        }
-        else if (target_y >= this->height() - this->slider.height())
-        {
-            target_y = this->height() - this->slider.height();
-        }
-
-        if (this->slider.y() != target_y)
-        {
-            this->shift = target_y * (this->area_size - this->height())
-                / (this->height() - this->slider.height());
-
-            this->refresh();
-
-            emit this->scroll_event();
-        }
+        this->scroll(target_y * (this->area_size - this->height())
+                / (this->height() - this->slider.height()));
     }
 }

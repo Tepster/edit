@@ -42,18 +42,10 @@ void _t::editor::scrollbar::slider_pressed(QMouseEvent *event)
 {
     this->scrolling = true;
 
-    this->init_coords(event->globalPos());
+    this->scroll_init_coords(event->globalPos());
 }
 
 void _t::editor::scrollbar::slider_released(QMouseEvent *)
 {
     this->scrolling = false;
-}
-
-
-void _t::editor::scrollbar::area_size_changed(qint32 size)
-{
-    this->area_size = size;
-
-    this->refresh();
 }

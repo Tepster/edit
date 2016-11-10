@@ -270,7 +270,6 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
         this->vscrollbar->area_size_changed(
             this->text.count() * this->cell_size.height());
         this->scroll_to_cursor();
-        this->safe_scroll_end();
 
         this->cursor_activate();
     }
@@ -310,7 +309,6 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
         this->vscrollbar->area_size_changed(
             this->text.count() * this->cell_size.height());
         this->scroll_to_cursor();
-        this->safe_scroll_end();
 
         this->cursor_activate();
     }
@@ -337,6 +335,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 
 void _t::editor::editor::wheelEvent(QWheelEvent *event)
 {
+    // 4 rows per usual wheel step
     qreal target_shift_px = qreal(this->shift.y()) - qreal(event->delta()) / 30
         * this->cell_size.height();
 
@@ -434,8 +433,6 @@ void _t::editor::editor::resizeEvent(QResizeEvent *)
     this->painter.init_canvas(&this->canvas);
     this->area.resize(this->canvas.size());
     this->redraw();
-
-    this->safe_scroll_end();
 
     this->cursor_activate();
 }
@@ -970,17 +967,6 @@ void _t::editor::editor::scroll_to_cursor()
     {
         this->vscrollbar->scroll((this->cursor.row() + 1)
                 * this->cell_size.height() - this->area.height());
-    }
-}
-
-void _t::editor::editor::safe_scroll_end()
-{
-    qint32 text_height = this->text.count() * this->cell_size.height();
-
-    if (text_height >= this->area.height()
-        && text_height < this->area.height() + this->shift.y())
-    {
-        this->vscrollbar->scroll(text_height - this->area.height());
     }
 }
 
