@@ -78,6 +78,11 @@ _t::editor::editor::editor()
     this->setFocusPolicy(Qt::StrongFocus);
 }
 
+_t::editor::editor::~editor()
+{
+    delete this->vscrollbar;
+}
+
 
 void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 {

@@ -314,6 +314,11 @@ public:
      */
     editor();
 
+    /**
+     * The main destructor.
+     */
+    ~editor();
+
 
     /**
      * Writes the text into editor's memory and displays it on the screen.
