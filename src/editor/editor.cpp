@@ -519,6 +519,11 @@ QString _t::editor::editor::get_text() const
     return ret;
 }
 
+void _t::editor::editor::move_cursor_to_beginning()
+{
+    this->cursor_move(coordinates(0, 0));
+}
+
 
 QString &_t::editor::editor::active_line()
 {

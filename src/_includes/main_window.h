@@ -42,9 +42,9 @@ class _t::main_window : public QWidget
     /**
      * The editor control.
      *
-     * @var _t::editor::editor editor
+     * @var _t::editor::editor * editor
      */
-    _t::editor::editor editor;
+    _t::editor::editor *editor;
 
     /**
      * Path of the opened file.

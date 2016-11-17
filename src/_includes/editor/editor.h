@@ -334,6 +334,11 @@ public:
     void write(const QString &text);
 
     /**
+     * Moves the cursor to the beginning of the text.
+     */
+    void move_cursor_to_beginning();
+
+    /**
      * Returns the joined text list as a string.
      *
      * @return QString
