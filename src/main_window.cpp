@@ -9,8 +9,6 @@
 #include <QFile>
 #include <QTextStream>
 
-#include <QString>
-
 
 _t::main_window::main_window(QWidget *parent)
     : QWidget(parent)
@@ -64,6 +62,22 @@ _t::main_window::main_window(QWidget *parent)
 }
 
 
+void _t::main_window::save(const QString &location)
+{
+    QFile file(location);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    QTextStream filestream(&file);
+    filestream.setCodec("UTF-8");
+    filestream << this->editor.get_text();
+    filestream.flush();
+
+    file.close();
+
+    this->file_path = location;
+}
+
+
 void _t::main_window::menu_file_new()
 {
 
@@ -76,22 +90,21 @@ void _t::main_window::menu_file_open()
 
 void _t::main_window::menu_file_save()
 {
-
+    if (this->file_path != 0)
+    {
+        this->save(this->file_path);
+    }
+    else
+    {
+        this->menu_file_save_as();
+    }
 }
 
 void _t::main_window::menu_file_save_as()
 {
     QString filename = QFileDialog::getSaveFileName(this, "Save");
 
-    QFile file(filename);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-
-    QTextStream filestream(&file);
-    filestream.setCodec("UTF-8");
-    filestream << this->editor.get_text();
-    filestream.flush();
-
-    file.close();
+    this->save(filename);
 }
 
 void _t::main_window::menu_file_quit()

@@ -6,6 +6,8 @@
 #include <QMenuBar>
 #include <QMenu>
 
+#include <QString>
+
 #include "editor/editor.h"
 
 
@@ -41,6 +43,21 @@ class _t::main_window : public QWidget
      * @var _t::editor::editor editor
      */
     _t::editor::editor editor;
+
+    /**
+     * Path of the opened file.
+     *
+     * @var QString file_path
+     */
+    QString file_path = 0;
+
+
+    /**
+     * Saves the file to specific location.
+     *
+     * @param const QString & location
+     */
+    void save(const QString &location);
 
 private slots:
     /**
