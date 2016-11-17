@@ -67,6 +67,15 @@ _t::main_window::main_window(QWidget *parent)
 }
 
 
+void _t::main_window::closeEvent(QCloseEvent *event)
+{
+    if (!this->check_save())
+    {
+        event->ignore();
+    }
+}
+
+
 void _t::main_window::save(const QString &location)
 {
     QFile file(location);

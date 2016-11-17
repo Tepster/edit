@@ -6,6 +6,8 @@
 #include <QMenuBar>
 #include <QMenu>
 
+#include <QCloseEvent>
+
 #include <QString>
 
 #include "editor/editor.h"
@@ -50,6 +52,14 @@ class _t::main_window : public QWidget
      * @var QString file_path
      */
     QString file_path;
+
+
+    /**
+     * Performs save check before closing.
+     *
+     * @param QCloseEvent * event
+     */
+    void closeEvent(QCloseEvent *event);
 
 
     /**
