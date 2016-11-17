@@ -59,6 +59,20 @@ class _t::main_window : public QWidget
      */
     void save(const QString &location);
 
+    /**
+     * Asks user if file should be saved and saves it, if desired.
+     *
+     * @return bool  False if user chose to cancel the action.
+     */
+    bool save_if_desired();
+
+    /**
+     * Checks if the document has been modified.
+     *
+     * @return bool
+     */
+    bool document_modified();
+
 private slots:
     /**
      * Initiates new file

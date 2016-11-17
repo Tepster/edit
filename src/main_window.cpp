@@ -1,5 +1,7 @@
 #include "main_window.h"
 
+#include <QApplication>
+
 #include <QVBoxLayout>
 #include <QSizePolicy>
 
@@ -7,7 +9,10 @@
 
 #include <QFileDialog>
 #include <QFile>
+#include <QIODevice>
 #include <QTextStream>
+
+#include <QMessageBox>
 
 
 _t::main_window::main_window(QWidget *parent)
@@ -77,6 +82,60 @@ void _t::main_window::save(const QString &location)
     this->file_path = location;
 }
 
+bool _t::main_window::save_if_desired()
+{
+    QMessageBox msgbox;
+    msgbox.setText("The document has been modified.");
+    msgbox.setInformativeText("Do you want to save your changes?");
+    msgbox.setStandardButtons(
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgbox.setDefaultButton(QMessageBox::Save);
+
+    qint32 answer = msgbox.exec();
+
+    if (answer == QMessageBox::Cancel)
+    {
+        return false;
+    }
+
+    if (answer == QMessageBox::Save)
+    {
+        this->menu_file_save();
+    }
+
+    return true;
+}
+
+bool _t::main_window::document_modified()
+{
+    // the document isn't saved as a file yet
+    if (this->file_path == 0)
+    {
+        if (this->editor.get_text().length())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // compare the saved file vs the current document
+    QFile file(this->file_path);
+    file.open(QIODevice::ReadOnly);
+
+    QString file_text = file.readAll();
+    QString document_text = this->editor.get_text();
+
+    file.close();
+
+    if (file_text == document_text)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 
 void _t::main_window::menu_file_new()
 {
@@ -109,5 +168,15 @@ void _t::main_window::menu_file_save_as()
 
 void _t::main_window::menu_file_quit()
 {
+    if (this->document_modified())
+    {
+        bool should_proceed = this->save_if_desired();
 
+        if (!should_proceed)
+        {
+            return;
+        }
+    }
+
+    QApplication::quit();
 }
