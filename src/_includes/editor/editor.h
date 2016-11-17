@@ -332,6 +332,13 @@ public:
      * @param const QString & text
      */
     void write(const QString &text);
+
+    /**
+     * Returns the joined text list as a string.
+     *
+     * @return QString
+     */
+    QString get_text() const;
 };
 
 #endif // _T_EDITOR_EDITOR_H

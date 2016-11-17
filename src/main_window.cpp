@@ -5,6 +5,12 @@
 
 #include <QKeySequence>
 
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
+
+#include <QString>
+
 
 _t::main_window::main_window(QWidget *parent)
     : QWidget(parent)
@@ -75,7 +81,17 @@ void _t::main_window::menu_file_save()
 
 void _t::main_window::menu_file_save_as()
 {
+    QString filename = QFileDialog::getSaveFileName(this, "Save");
 
+    QFile file(filename);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    QTextStream filestream(&file);
+    filestream.setCodec("UTF-8");
+    filestream << this->editor.get_text();
+    filestream.flush();
+
+    file.close();
 }
 
 void _t::main_window::menu_file_quit()

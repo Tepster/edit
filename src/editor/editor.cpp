@@ -502,6 +502,23 @@ void _t::editor::editor::write(const QString &text)
     this->cursor_activate();
 }
 
+QString _t::editor::editor::get_text() const
+{
+    QString ret;
+
+    for (qint32 i = 0; i < this->text.count(); ++i)
+    {
+        ret += this->text.at(i);
+
+        if (i < this->text.count() - 1)
+        {
+            ret += this->newline_character;
+        }
+    }
+
+    return ret;
+}
+
 
 QString &_t::editor::editor::active_line()
 {
