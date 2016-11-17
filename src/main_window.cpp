@@ -194,7 +194,22 @@ bool _t::main_window::document_modified() const
 
 void _t::main_window::menu_file_new()
 {
+    if (!this->check_save())
+    {
+        return;
+    }
 
+    this->file_path.clear();
+
+
+    delete this->editor;
+
+    this->editor = new _t::editor::editor;
+
+    // attach the new editor to the layout
+    QVBoxLayout *layout = static_cast<QVBoxLayout *>(this->layout());
+    layout->addWidget(this->editor);
+    this->setLayout(layout);
 }
 
 void _t::main_window::menu_file_open()
