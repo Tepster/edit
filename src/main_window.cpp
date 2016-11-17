@@ -70,7 +70,18 @@ _t::main_window::main_window(QWidget *parent)
 void _t::main_window::save(const QString &location)
 {
     QFile file(location);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    bool file_good = file.open(QIODevice::WriteOnly | QIODevice::Text);
+    if (!file_good)
+    {
+        QMessageBox msgbox;
+        msgbox.setText("Oops. There has been a problem saving the document.");
+        msgbox.exec();
+
+        this->file_path.clear();
+
+        return;
+    }
 
     QTextStream filestream(&file);
     filestream.setCodec("UTF-8");
@@ -82,35 +93,63 @@ void _t::main_window::save(const QString &location)
     this->file_path = location;
 }
 
-bool _t::main_window::save_if_desired()
+bool _t::main_window::check_save()
 {
-    QMessageBox msgbox;
-    msgbox.setText("The document has been modified.");
-    msgbox.setInformativeText("Do you want to save your changes?");
-    msgbox.setStandardButtons(
-        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    msgbox.setDefaultButton(QMessageBox::Save);
-
-    qint32 answer = msgbox.exec();
-
-    if (answer == QMessageBox::Cancel)
+    if (this->document_modified())
     {
+        QMessageBox msgbox;
+        msgbox.setText("The document has been modified.");
+        msgbox.setInformativeText("Do you want to save your changes?");
+        msgbox.setStandardButtons(
+            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgbox.setDefaultButton(QMessageBox::Save);
+
+        qint32 answer = msgbox.exec();
+
+        // user wants to save the document
+        if (answer == QMessageBox::Save)
+        {
+            if (this->file_path.length())
+            {
+                this->save(this->file_path);
+
+                return true;
+            }
+
+            QString location = this->ask_save_location();
+
+            if (location.length())
+            {
+                this->save(location);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        if (answer == QMessageBox::Discard)
+        {
+            return true;
+        }
+
         return false;
-    }
-
-    if (answer == QMessageBox::Save)
-    {
-        this->menu_file_save();
     }
 
     return true;
 }
 
-bool _t::main_window::document_modified()
+QString _t::main_window::ask_save_location()
 {
-    // the document isn't saved as a file yet
-    if (this->file_path == 0)
+    return QFileDialog::getSaveFileName(this, "Save");
+}
+
+bool _t::main_window::document_modified() const
+{
+    // document isn't saved as a file yet
+    if (this->file_path.length() == 0)
     {
+        // document isn't empty
         if (this->editor.get_text().length())
         {
             return true;
@@ -121,7 +160,12 @@ bool _t::main_window::document_modified()
 
     // compare the saved file vs the current document
     QFile file(this->file_path);
-    file.open(QIODevice::ReadOnly);
+
+    bool file_good = file.open(QIODevice::ReadOnly);
+    if (!file_good)
+    {
+        return true;
+    }
 
     QString file_text = file.readAll();
     QString document_text = this->editor.get_text();
@@ -149,7 +193,7 @@ void _t::main_window::menu_file_open()
 
 void _t::main_window::menu_file_save()
 {
-    if (this->file_path != 0)
+    if (this->file_path.length())
     {
         this->save(this->file_path);
     }
@@ -161,22 +205,18 @@ void _t::main_window::menu_file_save()
 
 void _t::main_window::menu_file_save_as()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Save");
+    QString filename = this->ask_save_location();
 
-    this->save(filename);
+    if (filename.length())
+    {
+        this->save(filename);
+    }
 }
 
 void _t::main_window::menu_file_quit()
 {
-    if (this->document_modified())
+    if (this->check_save())
     {
-        bool should_proceed = this->save_if_desired();
-
-        if (!should_proceed)
-        {
-            return;
-        }
+        QApplication::quit();
     }
-
-    QApplication::quit();
 }

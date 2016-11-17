@@ -49,7 +49,7 @@ class _t::main_window : public QWidget
      *
      * @var QString file_path
      */
-    QString file_path = 0;
+    QString file_path;
 
 
     /**
@@ -60,18 +60,25 @@ class _t::main_window : public QWidget
     void save(const QString &location);
 
     /**
-     * Asks user if file should be saved and saves it, if desired.
+     * Saves the document, if modified and user wants to save it.
      *
-     * @return bool  False if user chose to cancel the action.
+     * @return bool  False if user canceled the action.
      */
-    bool save_if_desired();
+    bool check_save();
+
+    /**
+     * Asks user for the location where the document should be saved.
+     *
+     * @return QString
+     */
+    QString ask_save_location();
 
     /**
      * Checks if the document has been modified.
      *
      * @return bool
      */
-    bool document_modified();
+    bool document_modified() const;
 
 private slots:
     /**
