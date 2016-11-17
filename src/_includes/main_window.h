@@ -3,6 +3,9 @@
 
 #include <QWidget>
 
+#include <QMenuBar>
+#include <QMenu>
+
 #include "editor/editor.h"
 
 
@@ -20,11 +23,50 @@ class _t::main_window : public QWidget
 
 
     /**
+     * The main navigation.
+     *
+     * @var QMenuBar menubar
+     */
+    QMenuBar menubar;
+
+    /**
+     * @var QMenu file_menu
+     */
+    QMenu file_menu;
+
+
+    /**
      * The editor control.
      *
      * @var _t::editor::editor editor
      */
     _t::editor::editor editor;
+
+private slots:
+    /**
+     * Initiates new file
+     */
+    void menu_file_new();
+
+    /**
+     * Opens the file.
+     */
+    void menu_file_open();
+
+    /**
+     * Saves the file.
+     */
+    void menu_file_save();
+
+    /**
+     * Saves the file to location specified by user.
+     */
+    void menu_file_save_as();
+
+    /**
+     * Quits the application.
+     */
+    void menu_file_quit();
 
 public:
     /**
