@@ -177,6 +177,12 @@ class _t::editor::editor : public QWidget
      */
     QString &active_line();
 
+    /**
+     * @param _t::editor::coordinates & from
+     * @param _t::editor::coordinates & to
+     */
+    void get_selected_range(coordinates &from,coordinates &to) const;
+
 
 
     /**

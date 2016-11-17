@@ -110,19 +110,8 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             {
                 QString text;
 
-                coordinates begin;
-                coordinates end;
-
-                if (this->cursor.selection_from < this->cursor.coords)
-                {
-                    begin = this->cursor.selection_from;
-                    end = this->cursor.coords - 1;
-                }
-                else
-                {
-                    begin = this->cursor.coords;
-                    end = this->cursor.selection_from;
-                }
+                coordinates begin, end;
+                this->get_selected_range(begin, end);
 
                 this->each_cell(begin, end, [&](const coordinates &coords)
                 {
@@ -249,20 +238,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->cursor.selection_mode = false;
 
             coordinates from, to;
-
-            // selection goes in forward direction
-            if (this->cursor.coords > this->cursor.selection_from)
-            {
-                from = this->cursor.selection_from;
-                to = this->cursor.coords - 1;
-
-                this->cursor.coords = from;
-            }
-            else
-            {
-                from = this->cursor.coords;
-                to = this->cursor.selection_from;
-            }
+            this->get_selected_range(from, to);
 
             this->delete_chars(from, to);
         }
@@ -288,20 +264,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->cursor.selection_mode = false;
 
             coordinates from, to;
-
-            // selection goes in forward direction
-            if (this->cursor.coords > this->cursor.selection_from)
-            {
-                from = this->cursor.selection_from;
-                to = this->cursor.coords - 1;
-
-                this->cursor.coords = from;
-            }
-            else
-            {
-                from = this->cursor.coords;
-                to = this->cursor.selection_from;
-            }
+            this->get_selected_range(from, to);
 
             this->delete_chars(from, to);
         }
@@ -457,22 +420,10 @@ void _t::editor::editor::write(const QString &text)
         this->cursor.selection_mode = false;
 
         coordinates from, to;
-
-        // selection goes in forward direction
-        if (this->cursor.coords > this->cursor.selection_from)
-        {
-            from = this->cursor.selection_from;
-            to = this->cursor.coords - 1;
-
-            this->cursor.coords = from;
-        }
-        else
-        {
-            from = this->cursor.coords;
-            to = this->cursor.selection_from;
-        }
+        this->get_selected_range(from, to);
 
         this->delete_chars(from, to);
+        this->cursor.coords = from;
     }
 
     for (QChar character : text)
@@ -557,6 +508,22 @@ QString &_t::editor::editor::active_line()
     return this->text[this->cursor.row()];
 }
 
+void _t::editor::editor::get_selected_range(
+    coordinates &from,
+    coordinates &to) const
+{
+    if (this->cursor.selection_from < this->cursor.coords)
+    {
+        from = this->cursor.selection_from;
+        to = this->cursor.coords - 1;
+    }
+    else
+    {
+        from = this->cursor.coords;
+        to = this->cursor.selection_from;
+    }
+}
+
 
 void _t::editor::editor::deselect()
 {
@@ -568,18 +535,7 @@ void _t::editor::editor::deselect()
     this->cursor.selection_mode = false;
 
     coordinates from, to;
-
-    // selection goes in forward direction
-    if (this->cursor.coords > this->cursor.selection_from)
-    {
-        from = this->cursor.selection_from;
-        to = this->cursor.coords - 1;
-    }
-    else
-    {
-        from = this->cursor.coords;
-        to = this->cursor.selection_from;
-    }
+    this->get_selected_range(from, to);
 
     this->each_cell(from, to, [&](const coordinates &coords)
     {
@@ -626,17 +582,7 @@ void _t::editor::editor::redraw()
         if (this->cursor.selection_mode)
         {
             coordinates selection_from, selection_to;
-
-            if (this->cursor.coords > this->cursor.selection_from)
-            {
-                selection_from = this->cursor.selection_from;
-                selection_to = this->cursor.coords - 1;
-            }
-            else
-            {
-                selection_from = this->cursor.coords;
-                selection_to = this->cursor.selection_from;
-            }
+            this->get_selected_range(selection_from, selection_to);
 
             this->each_cell(
                 selection_from,
