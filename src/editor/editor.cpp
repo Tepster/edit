@@ -9,6 +9,8 @@
 
 #include <QColor>
 #include <QFont>
+#include <QFontDatabase>
+#include <QFontMetrics>
 
 
 _t::editor::editor::editor()
@@ -44,7 +46,11 @@ _t::editor::editor::editor()
         SLOT(vscrolled()));
 
 
-    this->cell_size = QSize(10, 20);
+    this->font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    this->font.setPixelSize(16);
+
+    this->update_cell_size();
+
     this->selection_background = QColor(80, 80, 90);
 
 
@@ -60,7 +66,7 @@ _t::editor::editor::editor()
 
     this->painter.init(
         QColor(60, 60, 70),
-        QFont("Consolas", 12),
+        font,
         QColor(250, 250, 250),
         &this->cell_size,
         &this->shift,
@@ -408,6 +414,14 @@ void _t::editor::editor::resizeEvent(QResizeEvent *)
 void _t::editor::editor::vscrolled()
 {
     this->redraw();
+}
+
+
+void _t::editor::editor::update_cell_size()
+{
+    QFontMetrics fm(this->font);
+
+    this->cell_size = QSize(fm.width('a'), fm.height() + 2);
 }
 
 

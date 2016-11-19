@@ -96,6 +96,11 @@ class _t::editor::editor : public QWidget
      */
     QSize cell_size;
 
+    /**
+     * @var QFont font
+     */
+    QFont font;
+
 
     /**
      * @var _t::editor::cursor cursor
@@ -167,6 +172,12 @@ class _t::editor::editor : public QWidget
      * @param QResizeEvent * event
      */
     void resizeEvent(QResizeEvent *event);
+
+
+    /**
+     * Counts the cell size and loads it to the cell_size variable.
+     */
+    void update_cell_size();
 
 
 
