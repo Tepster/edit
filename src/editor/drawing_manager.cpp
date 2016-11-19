@@ -3,7 +3,7 @@
 
 void _t::editor::drawing_manager::init(
     const QColor &background,
-    const QFont &font,
+    const QFont *font,
     const QColor &font_color,
     QSize *cell_size,
     const QPoint *shift,
@@ -52,7 +52,7 @@ void _t::editor::drawing_manager::setup_clearing(const QColor &color)
 
 void _t::editor::drawing_manager::setup_writing()
 {
-    this->painter.setFont(this->font);
+    this->painter.setFont(*this->font);
     this->painter.setPen(this->font_color);
 }
 

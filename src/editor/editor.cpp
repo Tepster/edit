@@ -11,7 +11,7 @@
 #include <QFont>
 #include <QFontDatabase>
 #include <QFontMetrics>
-
+#include <QDebug>
 
 _t::editor::editor::editor()
 {
@@ -66,7 +66,7 @@ _t::editor::editor::editor()
 
     this->painter.init(
         QColor(60, 60, 70),
-        font,
+        &this->font,
         QColor(250, 250, 250),
         &this->cell_size,
         &this->shift,
@@ -92,7 +92,25 @@ _t::editor::editor::~editor()
 
 void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 {
-    if (event->modifiers() == Qt::ControlModifier)
+    if (event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier))
+    {
+        this->cursor_deactivate();
+
+        switch (event->key())
+        {
+        case Qt::Key_Plus:
+            this->increase_font_size();
+            break;
+
+        case Qt::Key_Minus:
+            this->decrease_font_size();
+            break;
+        }
+
+        this->cursor_activate();
+    }
+
+    else if (event->modifiers() == Qt::ControlModifier)
     {
         switch (event->key())
         {
@@ -309,11 +327,21 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 
 void _t::editor::editor::wheelEvent(QWheelEvent *event)
 {
-    // 4 rows per usual wheel step
-    qreal target_shift_px = qreal(this->shift.y()) - qreal(event->delta()) / 30
-        * this->cell_size.height();
+    // changing font size
+    if (event->modifiers() == Qt::ControlModifier)
+    {
+        this->increase_font_size(event->delta() / 120);
+    }
 
-    this->vscrollbar->scroll(target_shift_px);
+    // scrolling
+    else
+    {
+        // 4 rows per usual wheel step
+        qreal target_shift_px = qreal(this->shift.y()) - qreal(event->delta()) / 30
+            * this->cell_size.height();
+
+        this->vscrollbar->scroll(target_shift_px);
+    }
 }
 
 void _t::editor::editor::mouse_pressed(QMouseEvent *event)
@@ -1015,6 +1043,22 @@ void _t::editor::editor::cursor_timer_ticked()
     {
         this->cursor_show();
     }
+}
+
+
+void _t::editor::editor::increase_font_size(qint32 n)
+{
+    this->font.setPixelSize(this->font.pixelSize() + n);
+    this->update_cell_size();
+
+    this->vscrollbar->area_size_changed(
+        this->text.count() * this->cell_size.height());
+    this->redraw();
+}
+
+void _t::editor::editor::decrease_font_size(qint32 n)
+{
+    this->increase_font_size(-n);
 }
 
 

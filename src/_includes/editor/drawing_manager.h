@@ -53,9 +53,9 @@ class _t::editor::drawing_manager
     /**
      * The font family and style.
      *
-     * @var QFont font
+     * @var const QFont * font
      */
-    QFont font;
+    const QFont *font;
 
     /**
      * The default font color.
@@ -94,14 +94,14 @@ public:
      * Main initializer of default values.
      *
      * @param const QColor  & background
-     * @param const QFont   & font
+     * @param const QFont   * font
      * @param const QColor  & font_color
      * @param       QSize   * cell_size
      * @param       QPixmap * canvas
      */
     void init(
         const QColor &background,
-        const QFont &font,
+        const QFont *font,
         const QColor &font_color,
         QSize *cell_size,
         const QPoint *shift,

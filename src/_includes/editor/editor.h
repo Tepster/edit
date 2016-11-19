@@ -286,6 +286,21 @@ class _t::editor::editor : public QWidget
 
 
     /**
+     * Increases the editors font size by /n/.
+     *
+     * @param qint32 n
+     */
+    void increase_font_size(qint32 n = 1);
+
+    /**
+     * Decreases the editors font size by /n/.
+     *
+     * @param qint32 n
+     */
+    void decrease_font_size(qint32 n = 1);
+
+
+    /**
      * Applies a function to each cell of the coordinates range.
      * Range coordinates must be in ascending order.
      *
