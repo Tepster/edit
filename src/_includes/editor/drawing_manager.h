@@ -46,9 +46,9 @@ class _t::editor::drawing_manager
     /**
      * The background color.
      *
-     * @var QColor background
+     * @var const QColor * background
      */
-    QColor background;
+    const QColor * background;
 
     /**
      * The font family and style.
@@ -60,9 +60,9 @@ class _t::editor::drawing_manager
     /**
      * The default font color.
      *
-     * @var QColor font_color
+     * @var const QColor * font_color
      */
-    QColor font_color;
+    const QColor *font_color;
 
     /**
      * @var QSize cell_size *
@@ -86,23 +86,32 @@ class _t::editor::drawing_manager
 
     /**
      * Sets-up the painter to writing mode.
+     *
+     * @param const QColor & color
      */
     void setup_writing();
+
+    /**
+     * Sets-up the painter to writing mode by specified font color.
+     *
+     * @param const QColor & color
+     */
+    void setup_writing(const QColor &color);
 
 public:
     /**
      * Main initializer of default values.
      *
-     * @param const QColor  & background
+     * @param const QColor  * background
      * @param const QFont   * font
-     * @param const QColor  & font_color
+     * @param const QColor  * font_color
      * @param       QSize   * cell_size
      * @param       QPixmap * canvas
      */
     void init(
-        const QColor &background,
+        const QColor *background,
         const QFont *font,
-        const QColor &font_color,
+        const QColor *font_color,
         QSize *cell_size,
         const QPoint *shift,
         QPixmap *canvas = 0);
@@ -141,6 +150,20 @@ public:
         const _t::editor::coordinates &coords,
         const QChar &character,
         const QColor &background);
+
+    /**
+     * Paints the character to specified coordinates.
+     *
+     * @param const _t::editor::coordinates & coords
+     * @param const QChar                   & character
+     * @param const QColor                  & background
+     * @param const QColor                  & foreground
+     */
+    void draw_char(
+        const _t::editor::coordinates &coords,
+        const QChar &character,
+        const QColor &background,
+        const QColor &foreground);
 
     /**
      * Draws the cursor to the specified cell.

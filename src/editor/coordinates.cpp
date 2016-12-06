@@ -177,11 +177,11 @@ _t::editor::coordinates _t::editor::coordinates::operator-(quint32 value) const
 _t::editor::coordinates &_t::editor::coordinates::operator+=(quint32 value)
 {
     // veeery ugly
-    do
+    while (value > 0)
     {
         ++(*this);
+        --value;
     }
-    while (--value > 0);
 
     return *this;
 }
@@ -189,11 +189,11 @@ _t::editor::coordinates &_t::editor::coordinates::operator+=(quint32 value)
 _t::editor::coordinates &_t::editor::coordinates::operator-=(quint32 value)
 {
     // veeery ugly
-    do
+    while (value > 0)
     {
         --(*this);
+        --value;
     }
-    while (--value > 0);
 
     return *this;
 }

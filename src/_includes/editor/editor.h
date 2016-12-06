@@ -85,11 +85,16 @@ class _t::editor::editor : public QWidget
 
 
     /**
+     * @var QColor background
+     */
+    QColor background = QColor(60, 60, 70);
+
+    /**
      * The background color for selected cells.
      *
      * @var QColor selection_background
      */
-    QColor selection_background;
+    QColor selection_background = QColor(80, 80, 90);
 
     /**
      * @var QSize cell_size
@@ -100,6 +105,11 @@ class _t::editor::editor : public QWidget
      * @var QFont font
      */
     QFont font;
+
+    /**
+     * @var QColor font_color
+     */
+    QColor font_color = QColor(250, 250, 250);
 
 
     /**
@@ -192,7 +202,7 @@ class _t::editor::editor : public QWidget
      * @param _t::editor::coordinates & from
      * @param _t::editor::coordinates & to
      */
-    void get_selected_range(coordinates &from,coordinates &to) const;
+    void get_selected_range(coordinates &from, coordinates &to) const;
 
 
 
@@ -205,6 +215,12 @@ class _t::editor::editor : public QWidget
      * Redraws everything.
      */
     void redraw();
+
+
+    /**
+     * Performs the syntax highlighting.
+     */
+    void highlight_syntax();
 
 
     /**

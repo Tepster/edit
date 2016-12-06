@@ -2,9 +2,9 @@
 
 
 void _t::editor::drawing_manager::init(
-    const QColor &background,
+    const QColor *background,
     const QFont *font,
-    const QColor &font_color,
+    const QColor *font_color,
     QSize *cell_size,
     const QPoint *shift,
     QPixmap *canvas)
@@ -25,7 +25,7 @@ void _t::editor::drawing_manager::init_canvas(QPixmap *canvas)
 {
     this->canvas = canvas;
 
-    this->canvas->fill(this->background);
+    this->canvas->fill(*this->background);
 
     painter.begin(this->canvas);
 }
@@ -41,7 +41,7 @@ void _t::editor::drawing_manager::end()
 
 void _t::editor::drawing_manager::setup_clearing()
 {
-    this->setup_clearing(this->background);
+    this->setup_clearing(*this->background);
 }
 
 void _t::editor::drawing_manager::setup_clearing(const QColor &color)
@@ -52,8 +52,13 @@ void _t::editor::drawing_manager::setup_clearing(const QColor &color)
 
 void _t::editor::drawing_manager::setup_writing()
 {
+    this->setup_writing(*this->font_color);
+}
+
+void _t::editor::drawing_manager::setup_writing(const QColor &color)
+{
     this->painter.setFont(*this->font);
-    this->painter.setPen(this->font_color);
+    this->painter.setPen(color);
 }
 
 
@@ -61,7 +66,27 @@ void _t::editor::drawing_manager::draw_char(
     const coordinates &coords,
     const QChar &character)
 {
-    this->setup_writing();
+    this->draw_char(coords, character, *this->background);
+}
+
+
+void _t::editor::drawing_manager::draw_char(
+    const coordinates &coords,
+    const QChar &character,
+    const QColor &background)
+{
+    this->draw_char(coords, character, background, *this->font_color);
+}
+
+void _t::editor::drawing_manager::draw_char(
+    const coordinates &coords,
+    const QChar &character,
+    const QColor &background,
+    const QColor &foreground)
+{
+    this->clear(coords, background);
+
+    this->setup_writing(foreground);
 
     this->painter.drawText(
         coords.col * this->cell_size->width() - this->shift->x(),
@@ -70,16 +95,6 @@ void _t::editor::drawing_manager::draw_char(
         this->cell_size->height(),
         Qt::AlignCenter,
         character);
-}
-
-void _t::editor::drawing_manager::draw_char(
-    const coordinates &coords,
-    const QChar &character,
-    const QColor &background)
-{
-    this->clear(coords, background);
-
-    this->draw_char(coords, character);
 }
 
 void _t::editor::drawing_manager::draw_cursor(const coordinates &coords)
@@ -231,7 +246,7 @@ void _t::editor::drawing_manager::shift_right(
 
 void _t::editor::drawing_manager::clear(const coordinates &coords)
 {
-    this->clear(coords, this->background);
+    this->clear(coords, *this->background);
 }
 
 void _t::editor::drawing_manager::clear(

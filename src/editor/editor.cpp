@@ -8,10 +8,13 @@
 #include <QChar>
 
 #include <QColor>
+#include <QRgb>
 #include <QFont>
 #include <QFontDatabase>
 #include <QFontMetrics>
-#include <QDebug>
+
+#include "editor/sh_rules.h"
+
 
 _t::editor::editor::editor()
 {
@@ -51,8 +54,6 @@ _t::editor::editor::editor()
 
     this->update_cell_size();
 
-    this->selection_background = QColor(80, 80, 90);
-
 
     this->vscrollbar->area_size_changed(this->cell_size.height());
 
@@ -65,9 +66,9 @@ _t::editor::editor::editor()
     this->canvas = QPixmap(this->size());
 
     this->painter.init(
-        QColor(60, 60, 70),
+        &this->background,
         &this->font,
-        QColor(250, 250, 250),
+        &this->font_color,
         &this->cell_size,
         &this->shift,
         &this->canvas);
@@ -265,6 +266,8 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->get_selected_range(from, to);
 
             this->delete_chars(from, to);
+
+            this->cursor.coords = from;
         }
         else if (this->cursor.coords)
         {
@@ -291,6 +294,8 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->get_selected_range(from, to);
 
             this->delete_chars(from, to);
+
+            this->cursor.coords = from;
         }
         else
         {
@@ -539,7 +544,7 @@ void _t::editor::editor::write(const QString &text)
 
     this->scroll_to_cursor();
 
-    this->update();
+    this->redraw();
 
     this->cursor_activate();
 }
@@ -643,6 +648,9 @@ void _t::editor::editor::redraw()
             });
 
 
+        this->highlight_syntax();
+
+
         if (this->cursor.selection_mode)
         {
             coordinates selection_from, selection_to;
@@ -660,7 +668,49 @@ void _t::editor::editor::redraw()
         this->update();
     }
 
+
     this->cursor_activate();
+}
+
+
+void _t::editor::editor::highlight_syntax()
+{
+    static sh_rules rules;
+
+    QString text = this->get_text();
+
+    for (
+        QMap<unsigned int, QString>::iterator it = rules.cpp.begin();
+        it != rules.cpp.end();
+        ++it)
+    {
+        QColor color = QColor::fromRgba(it.key());
+        QRegExp regexp(it.value());
+
+        qint32 pos = 0;
+        while ((pos = regexp.indexIn(text, pos)) >= 0)
+        {
+            coordinates start(0, 0, &this->text);
+            int a = regexp.pos(1);
+            start += regexp.pos(1);
+
+            this->each_cell(start, start + regexp.cap(1).length() - 1,
+                [&](const coordinates &coords)
+                {
+                    if (this->text.at(coords.row).length() > coords.col)
+                    {
+                        this->painter.clear(coords);
+                        this->painter.draw_char(
+                            coords,
+                            this->text.at(coords.row).at(coords.col),
+                            this->background,
+                            color);
+                    }
+                });
+
+            pos += regexp.matchedLength();
+        }
+    }
 }
 
 
@@ -964,6 +1014,8 @@ void _t::editor::editor::cursor_move(
     }
 
     this->cursor.coords = target_coords;
+
+    this->redraw();
 
     this->scroll_to_cursor();
 }
