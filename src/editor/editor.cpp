@@ -7,9 +7,8 @@
 
 #include <QChar>
 
-#include <QColor>
 #include <QRgb>
-#include <QFont>
+
 #include <QFontDatabase>
 #include <QFontMetrics>
 
@@ -93,16 +92,19 @@ _t::editor::editor::~editor()
 
 void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 {
+    // ctrl + numeric keyboard key
     if (event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier))
     {
         this->cursor_deactivate();
 
         switch (event->key())
         {
+        // increase the font size
         case Qt::Key_Plus:
             this->increase_font_size();
             break;
 
+        // decrease the font size
         case Qt::Key_Minus:
             this->decrease_font_size();
             break;
@@ -111,25 +113,26 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
         this->cursor_activate();
     }
 
+    // ctrl +
     else if (event->modifiers() == Qt::ControlModifier)
     {
         switch (event->key())
         {
+        // select all
         case Qt::Key_A:
             this->cursor_deactivate();
 
-            this->cursor.selection_mode = false;
-            this->cursor.coords = coordinates(0, 0);
+            this->cursor.selection_mode = true;
+            this->cursor.selection_from = coordinates(0, 0);
+            this->cursor.coords =
+                coordinates(this->text.count(), this->text.last().length());
 
-            this->cursor_move(
-                coordinates(
-                    this->text.count() - 1,
-                    this->text.at(this->text.count() - 1).length()),
-                true);
+            this->redraw();
 
             this->cursor_activate();
             break;
 
+        // copy to clipboard
         case Qt::Key_C:
             if (this->cursor.selection_mode)
             {
@@ -138,11 +141,12 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
                 coordinates begin, end;
                 this->get_selected_range(begin, end);
 
+                // todo
                 this->each_cell(begin, end, [&](const coordinates &coords)
                 {
-                    if (this->text[coords.row].length() > coords.col)
+                    if (this->text.at(coords.row).length() > coords.col)
                     {
-                        text += this->text[coords.row][coords.col];
+                        text += this->text.at(coords.row).at(coords.col);
                     }
                     else
                     {
@@ -154,6 +158,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             }
             break;
 
+        // paste from clipboard
         case Qt::Key_V:
             this->write(QApplication::clipboard()->text());
             break;
@@ -165,40 +170,35 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         this->cursor_deactivate();
 
-        bool selection;
-        if (event->modifiers() != Qt::ShiftModifier)
+        if (event->modifiers() == Qt::ShiftModifier)
         {
-            this->deselect();
-            selection = false;
+            if (!this->cursor.selection_mode)
+            {
+                this->cursor.selection_mode = true;
+                this->cursor.selection_from = this->cursor.coords;
+            }
         }
         else
         {
-            selection = true;
+            this->cursor.selection_mode = false;
         }
-
 
         switch (event->key())
         {
         case Qt::Key_Left:
-            this->cursor_move(this->cursor.coords - 1, selection);
+            --this->cursor;
             break;
 
         case Qt::Key_Up:
-            this->cursor_move(
-                coordinates(
-                    this->cursor.row() > 0 ? this->cursor.row() - 1 : 0,
-                    this->cursor.col()),
-                selection);
+            this->cursor.coords.set_row(this->cursor.row() - 1);
             break;
 
         case Qt::Key_Right:
-            this->cursor_move(this->cursor.coords + 1, selection);
+            this->cursor++;
             break;
 
         case Qt::Key_Down:
-            this->cursor_move(
-                coordinates(this->cursor.row() + 1, this->cursor.col()),
-                selection);
+            this->cursor.coords.set_row(this->cursor.row() + 1);
             break;
 
         case Qt::Key_Home:
@@ -216,44 +216,44 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             // OR at the beginning of the line
             if (i < this->cursor.col() || this->cursor.col() == 0)
             {
-                // move it to /i/
-                this->cursor_move(
-                    coordinates(this->cursor.row(), i),
-                    selection);
+                this->cursor.coords.set_col(i);
             }
             else
             {
-                // move to the beginning of the line
-                this->cursor_move(
-                    coordinates(this->cursor.row(), 0),
-                    selection);
+                this->cursor.coords.set_col(0);
             }
         }
             break;
 
         case Qt::Key_End:
-            this->cursor_move(
-                coordinates(this->cursor.row(), this->active_line().length()),
-                selection);
+            this->cursor.coords.set_col(this->active_line().length());
             break;
 
         case Qt::Key_PageUp:
-            //this->cursor.move(some_coords);
+            // todo
             break;
 
         case Qt::Key_PageDown:
-            //this->cursor.move(some_coords);
+            // todo
             break;
+        }
+
+        if (this->cursor.selection_mode
+            && this->cursor.selection_from == this->cursor.coords)
+        {
+            this->cursor.selection_mode = false;
         }
 
         this->cursor_activate();
     }
 
+    // new line
     else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
     {
         this->write(this->newline_character);
     }
 
+    // backspace
     else if (event->key() == Qt::Key_Backspace)
     {
         this->cursor_deactivate();
@@ -274,14 +274,16 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->delete_char(--this->cursor.coords);
         }
 
-        this->redraw();
         this->vscrollbar->area_size_changed(
             this->text.count() * this->cell_size.height());
         this->scroll_to_cursor();
 
+        this->redraw();
+
         this->cursor_activate();
     }
 
+    // delete
     else if (event->key() == Qt::Key_Delete)
     {
         this->cursor_deactivate();
@@ -302,19 +304,22 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             this->delete_char(this->cursor.coords);
         }
 
-        this->redraw();
         this->vscrollbar->area_size_changed(
             this->text.count() * this->cell_size.height());
         this->scroll_to_cursor();
 
+        this->redraw();
+
         this->cursor_activate();
     }
 
+    // tab
     else if (event->key() == Qt::Key_Tab)
     {
         this->write("    ");
     }
 
+    // escape
     else if (event->key() == Qt::Key_Escape)
     {
         this->cursor_deactivate();
@@ -680,8 +685,8 @@ void _t::editor::editor::highlight_syntax()
     QString text = this->get_text();
 
     for (
-        QMap<unsigned int, QString>::iterator it = rules.cpp.begin();
-        it != rules.cpp.end();
+        QMap<unsigned int, QString>::iterator it = rules.assembly.begin();
+        it != rules.assembly.end();
         ++it)
     {
         QColor color = QColor::fromRgba(it.key());
@@ -1025,16 +1030,19 @@ void _t::editor::editor::scroll_to_cursor()
     // cursor above the viewport
     if (this->cursor.row() * this->cell_size.height() < this->shift.y())
     {
-        this->vscrollbar->scroll(this->cursor.row() * this->cell_size.height());
+        return this->vscrollbar
+            ->scroll(this->cursor.row() * this->cell_size.height());
     }
 
     // cursor below the viewport
     else if ((this->cursor.row() + 1) * this->cell_size.height()
         > this->area.height() + this->shift.y())
     {
-        this->vscrollbar->scroll((this->cursor.row() + 1)
+        return this->vscrollbar->scroll((this->cursor.row() + 1)
                 * this->cell_size.height() - this->area.height());
     }
+
+    return false;
 }
 
 

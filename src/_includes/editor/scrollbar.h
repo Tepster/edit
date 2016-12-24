@@ -134,8 +134,9 @@ public:
      * and fires the scroll_event.
      *
      * @param qint32 shift
+     * @return bool  Whether the scrolling actually occured.
      */
-    virtual void scroll(qint32 shift) = 0;
+    virtual bool scroll(qint32 shift) = 0;
 
 signals:
     /**

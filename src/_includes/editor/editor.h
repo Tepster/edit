@@ -21,6 +21,7 @@
 #include <QColor>
 #include <QPoint>
 #include <QSize>
+#include <QFont>
 
 #include "controls/label.h"
 

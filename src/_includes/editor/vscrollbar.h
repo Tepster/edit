@@ -79,8 +79,9 @@ public:
      * Moves the slider to position specified by shift.
      *
      * @param qint32 shift
+     * @return bool  Whether the scrolling actually occured.
      */
-    void scroll(qint32 shift) override;
+    bool scroll(qint32 shift) override;
 };
 
 #endif // _T_EDITOR_VSCROLLBAR_H

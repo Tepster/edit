@@ -10,7 +10,7 @@ _t::editor::vscrollbar::vscrollbar(qint32 &shift)
 }
 
 
-void _t::editor::vscrollbar::scroll(qint32 shift)
+bool _t::editor::vscrollbar::scroll(qint32 shift)
 {
     // should scroll to negative OR text area height smaller than the editor
     if (shift < 0 || this->area_size <= this->height())
@@ -32,13 +32,17 @@ void _t::editor::vscrollbar::scroll(qint32 shift)
         this->refresh();
 
         emit this->scroll_event();
+
+        return true;
     }
+
+    return false;
 }
 
 
 void _t::editor::vscrollbar::area_size_changed(qint32 height)
 {
-    // only proceed if there is a change
+    // only proceed if there is actually a change
     if (this->area_size != height)
     {
         this->area_size = height;

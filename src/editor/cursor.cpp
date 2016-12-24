@@ -3,12 +3,12 @@
 
 quint32 &_t::editor::cursor::row()
 {
-    return this->coords.row;
+    return (quint32)this->coords.row;
 }
 
 quint32 &_t::editor::cursor::col()
 {
-    return this->coords.col;
+    return (quint32)this->coords.col;
 }
 
 

@@ -31,16 +31,16 @@ struct _t::editor::coordinates
     /**
      * The actual row value as an x-coordinate.
      *
-     * @var quint32 row
+     * @var qint32 row
      */
-    quint32 row = 0;
+    qint32 row = 0;
 
     /**
      * The actual column value as a y-coordinate.
      *
-     * @var quint32 col
+     * @var qint32 col
      */
-    quint32 col = 0;
+    qint32 col = 0;
 
 
     /**
@@ -58,12 +58,21 @@ struct _t::editor::coordinates
     /**
      * Constructor that sets-up the coordinates values and text pointer.
      *
-     * @param       quint32       row
-     * @param       quint32       col
+     * @param       qint32        row
+     * @param       qint32        col
      * @param const QStringList * text
      */
-    coordinates(quint32 row, quint32 col, const QStringList *text = 0);
+    coordinates(qint32 row, qint32 col, const QStringList *text = 0);
 
+
+    /**
+     * Sets the row and column coordinates and text pointer, if provided.
+     *
+     * @param       qint32        row
+     * @param       qint32        col
+     * @param const QStringList * text
+     */
+    void set(qint32 row, qint32 col, const QStringList *text = 0);
 
     /**
      * Sets-up the text pointer.
@@ -72,28 +81,19 @@ struct _t::editor::coordinates
      */
     void set_text(const QStringList *text);
 
-
     /**
      * Sets the row coordinate.
      *
-     * @param quint32 row
+     * @param qint32 row
      */
-    void set_row(quint32 row);
+    void set_row(qint32 row);
 
     /**
      * Sets the column coordinate.
      *
-     * @param quint32 col
+     * @param qint32 col
      */
-    void set_col(quint32 col);
-
-    /**
-     * Sets the row and column coordinates.
-     *
-     * @param quint32 row
-     * @param quint32 col
-     */
-    void set(quint32 row, quint32 col);
+    void set_col(qint32 col);
 
 
     /**
@@ -139,35 +139,44 @@ struct _t::editor::coordinates
     /**
      * Creates new coordinates /value/ cells forward.
      *
-     * @param quint32 value
+     * @param qint32 value
      * @return _t::editor::coordinates
      */
-    coordinates operator+(quint32 value) const;
+    coordinates operator+(qint32 value) const;
 
     /**
      * Creates new coordinates /value/ cells backward.
      *
-     * @param quint32 value
+     * @param qint32 value
      * @return _t::editor::coordinates
      */
-    coordinates operator-(quint32 value) const;
+    coordinates operator-(qint32 value) const;
 
 
     /**
      * Moves the coordinates /value/ cells forward.
      *
-     * @param quint32 value
+     * @param qint32 value
      * @return _t::editor::coordinates &
      */
-    coordinates &operator+=(quint32 value);
+    coordinates &operator+=(qint32 value);
 
     /**
      * Moves the coordinates /value/ cells backward.
      *
-     * @param quint32 value
+     * @param qint32 value
      * @return _t::editor::coordinates &
      */
-    coordinates &operator-=(quint32 value);
+    coordinates &operator-=(qint32 value);
+
+
+    /**
+     * Counts the distance between two coordinates.
+     *
+     * @param const _t::editor::coordinates & value
+     * @return qint32
+     */
+    qint32 operator-(const coordinates &value) const;
 
 
     /**
