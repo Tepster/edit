@@ -38,6 +38,11 @@ class _t::main_window : public QWidget
      */
     QMenu file_menu;
 
+    /**
+     * @var QMenu sh_menu
+     */
+    QMenu sh_menu;
+
 
     /**
      * The editor control.
@@ -92,7 +97,7 @@ class _t::main_window : public QWidget
 
 private slots:
     /**
-     * Initiates new file
+     * Initiates new file.
      */
     void menu_file_new();
 
@@ -115,6 +120,37 @@ private slots:
      * Quits the application.
      */
     void menu_file_quit();
+
+
+    /**
+     * Highlights for C++.
+     */
+    void menu_sh_cpp();
+
+    /**
+     * Highlights for C#.
+     */
+    void menu_sh_csharp();
+
+    /**
+     * Highlights for PHP.
+     */
+    void menu_sh_php();
+
+    /**
+     * Highlights for JavaScript.
+     */
+    void menu_sh_javascript();
+
+    /**
+     * Highlights for HTML.
+     */
+    void menu_sh_html();
+
+    /**
+     * Highlights for CSS.
+     */
+    void menu_sh_css();
 
 public:
     /**
