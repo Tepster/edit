@@ -301,30 +301,30 @@ void _t::main_window::menu_file_quit()
 
 void _t::main_window::menu_sh_cpp()
 {
-
+    this->editor->set_sh_rules(&this->sh_rules.cpp);
 }
 
 void _t::main_window::menu_sh_csharp()
 {
-
+    this->editor->set_sh_rules(&this->sh_rules.csharp);
 }
 
 void _t::main_window::menu_sh_php()
 {
-
+    this->editor->set_sh_rules(&this->sh_rules.php);
 }
 
 void _t::main_window::menu_sh_javascript()
 {
-
+    this->editor->set_sh_rules(&this->sh_rules.javascript);
 }
 
 void _t::main_window::menu_sh_html()
 {
-
+    this->editor->set_sh_rules(&this->sh_rules.html);
 }
 
 void _t::main_window::menu_sh_css()
 {
-
+    this->editor->set_sh_rules(&this->sh_rules.css);
 }

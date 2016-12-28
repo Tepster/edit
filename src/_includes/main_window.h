@@ -11,6 +11,7 @@
 #include <QString>
 
 #include "editor/editor.h"
+#include "editor/sh_rules.h"
 
 
 namespace _t
@@ -50,6 +51,11 @@ class _t::main_window : public QWidget
      * @var _t::editor::editor * editor
      */
     _t::editor::editor *editor;
+
+    /**
+     * @var _t::editor::sh_rules sh_rules
+     */
+    _t::editor::sh_rules sh_rules;
 
     /**
      * Path of the opened file.

@@ -13,8 +13,6 @@
 #include <QFontDatabase>
 #include <QFontMetrics>
 
-#include "editor/sh_rules.h"
-
 
 _t::editor::editor::editor()
 {
@@ -572,6 +570,14 @@ void _t::editor::editor::move_cursor_to_beginning()
 }
 
 
+void _t::editor::editor::set_sh_rules(const QVector<QPair<QColor, QString>> *rules)
+{
+    this->sh_rules = rules;
+
+    this->redraw();
+}
+
+
 QString &_t::editor::editor::active_line()
 {
     return this->text[this->cursor.row()];
@@ -675,17 +681,16 @@ void _t::editor::editor::redraw()
 
 void _t::editor::editor::highlight_syntax()
 {
-    static sh_rules rules;
+    if (!this->sh_rules)
+    {
+        return;
+    }
 
     QString text = this->get_text();
 
-    for (
-        QMap<unsigned int, QString>::iterator it = rules.cpp.begin();
-        it != rules.cpp.end();
-        ++it)
+    for (QPair<QColor, QString> rule : *this->sh_rules)
     {
-        QColor color = QColor::fromRgba(it.key());
-        QRegExp regexp(it.value());
+        QRegExp regexp(rule.second);
 
         qint32 pos = 0;
         while ((pos = regexp.indexIn(text, pos)) >= 0)
@@ -704,7 +709,7 @@ void _t::editor::editor::highlight_syntax()
                             coords,
                             this->text.at(coords.row).at(coords.col),
                             this->background,
-                            color);
+                            rule.first);
                     }
                 });
 

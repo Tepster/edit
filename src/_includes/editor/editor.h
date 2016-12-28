@@ -18,6 +18,9 @@
 #include <QString>
 #include <QStringList>
 
+#include <QVector>
+#include <QPair>
+
 #include <QColor>
 #include <QPoint>
 #include <QSize>
@@ -145,6 +148,12 @@ class _t::editor::editor : public QWidget
      * @var QChar newline_character
      */
     QChar newline_character = '\n';
+
+
+    /**
+     * @var const QVector<QPair<QColor, QString>> * sh_rules
+     */
+    const QVector<QPair<QColor, QString>> *sh_rules = 0;
 
 
 
@@ -386,6 +395,12 @@ public:
      * @return QString
      */
     QString get_text() const;
+
+
+    /**
+     * @param const QVector<QPair<QColor, QString>> * rules
+     */
+    void set_sh_rules(const QVector<QPair<QColor, QString>> *rules);
 };
 
 #endif // _T_EDITOR_EDITOR_H
