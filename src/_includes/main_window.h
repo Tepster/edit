@@ -158,6 +158,11 @@ private slots:
      */
     void menu_sh_css();
 
+    /**
+     * Disables highlighting.
+     */
+    void menu_sh_none();
+
 public:
     /**
      * @param QWidget * parent

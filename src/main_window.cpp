@@ -65,6 +65,8 @@ _t::main_window::main_window(QWidget *parent)
     this->sh_menu.addAction("JavaScript", this, SLOT(menu_sh_javascript()));
     this->sh_menu.addAction("HTML", this, SLOT(menu_sh_html()));
     this->sh_menu.addAction("CSS", this, SLOT(menu_sh_css()));
+    this->sh_menu.addSeparator();
+    this->sh_menu.addAction("None", this, SLOT(menu_sh_none()));
 
 
     this->editor = new _t::editor::editor;
@@ -327,4 +329,9 @@ void _t::main_window::menu_sh_html()
 void _t::main_window::menu_sh_css()
 {
     this->editor->set_sh_rules(&this->sh_rules.css);
+}
+
+void _t::main_window::menu_sh_none()
+{
+    this->editor->set_sh_rules(0);
 }
