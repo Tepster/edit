@@ -24,6 +24,9 @@ public:
         // number literals
         { QColor(180, 120, 230), "\\b(\\d+|0x[0-9a-fA-F]+)\\b" },
 
+        // other literals
+        { QColor(180, 120, 230), "\\b(true|false)\\b" },
+
         // functions
         { QColor(120, 220, 255), "\\b([a-zA-Z_][a-zA-Z0-9_]*)[^\\S\\n]*\\(" },
 
@@ -110,7 +113,43 @@ public:
 
     QVector<QPair<QColor, QString>> php
     {
+        // number literals
+        { QColor(180, 120, 230), "\\b(\\d+|0x[0-9a-fA-F]+)\\b" },
 
+        // other literals
+        { QColor(180, 120, 230), "\\b(null|true|false)\\b" },
+
+        // magic constants
+        { QColor(180, 120, 230), "\\b(__(?:LINE|FILE|DIR|FUNCTION|CLASS|TRAIT|"
+                                 "METHOD|NAMESPACE)__)\\b" },
+
+        // functions
+        { QColor(120, 220, 255), "\\b([a-zA-Z_][a-zA-Z0-9_]*)[^\\S\\n]*\\(" },
+
+        // general keywords
+        { QColor(255, 90, 100), "\\b(abstract|and|as|break|callable|case|catch|"
+                                "class|clone|const|continue|declare|default|do|"
+                                "echo|else|elseif|enddeclare|endforeach|endif|"
+                                "endswitch|endwhile|extends|final|finally|for|"
+                                "foreach|function|global|goto|if|implements|"
+                                "include|include_once|instanceof|insteadof|"
+                                "interface|namespace|new|or|print|private|"
+                                "protected|public|require|require_once|return|"
+                                "static|switch|throw|trait|try|use|void|while|"
+                                "xor|yield)\\b" },
+
+        // types
+        { QColor(100, 200, 255), "\\b(array|binary|bool|boolean|char|double|"
+                                 "float|int|integer|object|real|string|unset|"
+                                 "var)\\b" },
+
+        // string literals
+        { QColor(100, 200, 100), "(\"(?:[^\\n\"]|\\\")*\"|"
+                                 "'(?:[^\\n']|\\')*')" },
+
+        // comments
+        { QColor(130, 130, 130), "((?:/\\*[^(?:\\*/)]*(?:\\*/)?)|"
+                                 "(?://[^\\n]*))" },
     };
 
     QVector<QPair<QColor, QString>> javascript
