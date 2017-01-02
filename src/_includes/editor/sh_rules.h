@@ -154,7 +154,37 @@ public:
 
     QVector<QPair<QColor, QString>> javascript
     {
+        // number literals
+        { QColor(180, 120, 230), "\\b(\\d+|0x[0-9a-fA-F]+)\\b" },
 
+        // other literals
+        { QColor(180, 120, 230), "\\b(null|true|false|undefined|Infinity|"
+                                 "NaN)\\b" },
+
+        // functions
+        { QColor(120, 220, 255), "\\b([$a-zA-Z_][0-9a-zA-Z_$]*)\\(" },
+
+        // general keywords
+        { QColor(255, 90, 100), "\\b(abstract|boolean|break|byte|case|catch|"
+                                "char|class|const|continue|debugger|default|"
+                                "delete|do|double|else|enum|export|extends|"
+                                "final|finally|float|for|function|goto|if|"
+                                "implements|import|in|instanceof|int|interface|"
+                                "long|native|new|package|private|protected|"
+                                "public|return|short|static|super|switch|"
+                                "synchronized|this|throw|throws|transient|try|"
+                                "typeof|var|void|volatile|while|with)\\b" },
+
+        // types
+        { QColor(100, 200, 255), "\\b(array|object|var)\\b" },
+
+        // string literals
+        { QColor(100, 200, 100), "(\"(?:[^\\n\"]|\\\")*\"|"
+                                 "'(?:[^\\n']|\\')*')" },
+
+        // comments
+        { QColor(130, 130, 130), "((?:/\\*[^(?:\\*/)]*(?:\\*/)?)|"
+                                 "(?://[^\\n]*))" },
     };
 
     QVector<QPair<QColor, QString>> html
