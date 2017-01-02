@@ -189,7 +189,20 @@ public:
 
     QVector<QPair<QColor, QString>> html
     {
+        // tags
+        { QColor(255, 90, 100), "<(\\s*[a-zA-Z0-9_]+)" },
 
+        // end tags
+        { QColor(255, 90, 100), "<\\s*/\\s*([a-zA-Z0-9_]+)\\s*>" },
+
+        // tags' attributes
+        { QColor(120, 220, 255), "<\\s*[a-zA-Z0-9_]+\\s+([^>]+)" },
+
+        // attributes' values
+        { QColor(100, 200, 100), "\\b[a-zA-Z0-9_-]+\\s*=\\s*((?:[a-zA-Z0-9_-]+)|(?:\"[a-zA-Z0-9_-]+\")|(?:'[a-zA-Z0-9_-]+'))" },
+
+        // equal signs
+        { QColor(255, 255, 255), "\\b[a-zA-Z0-9_-]+\\s*(=)" },
     };
 
     QVector<QPair<QColor, QString>> css
