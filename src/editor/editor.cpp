@@ -319,12 +319,31 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             break;
 
         case Qt::Key_PageUp:
-            //this->cursor.move(some_coords);
+        {
+            qint32 target_row = this->cursor.row()
+                - (int)(this->height() / this->cell_size.height()) + 1;
+
+            this->cursor_move(
+                coordinates(
+                    target_row > 0 ? target_row : 0,
+                    this->cursor.col()),
+                selection);
+        }
             break;
 
         case Qt::Key_PageDown:
-            //this->cursor.move(some_coords);
+        {
+            qint32 target_row = this->cursor.row()
+                + (int)(this->height() / this->cell_size.height()) - 1;
+
+            this->cursor_move(
+                coordinates(
+                    target_row,
+                    this->cursor.col()),
+                selection);
+        }
             break;
+
         }
 
         this->cursor_activate();
