@@ -181,6 +181,44 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         switch (event->key())
         {
+        case Qt::Key_Up:
+            // shifting lines upwards
+            if (this->cursor.row() > 0)
+            {
+                this->cursor_deactivate();
+
+                QString tmp(this->active_line());
+                this->text[this->cursor.row()] =
+                    this->text.at(this->cursor.row() - 1);
+                this->text[this->cursor.row() - 1] = tmp;
+
+                --this->cursor.row();
+
+                this->redraw();
+
+                this->cursor_activate();
+            }
+            break;
+
+        case Qt::Key_Down:
+            // shifting lines downwards
+            if (this->cursor.row() < this->text.count() - 1)
+            {
+                this->cursor_deactivate();
+
+                QString tmp(this->active_line());
+                this->text[this->cursor.row()] =
+                    this->text.at(this->cursor.row() + 1);
+                this->text[this->cursor.row() + 1] = tmp;
+
+                ++this->cursor.row();
+
+                this->redraw();
+
+                this->cursor_activate();
+            }
+            break;
+
         case Qt::Key_Home:
             this->cursor_deactivate();
 
