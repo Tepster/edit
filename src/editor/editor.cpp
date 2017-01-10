@@ -113,6 +113,25 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         switch (event->key())
         {
+        case Qt::Key_Home:
+            this->cursor_deactivate();
+
+            this->cursor_move(coordinates(0, 0));
+
+            this->cursor_activate();
+            break;
+
+        case Qt::Key_End:
+            this->cursor_deactivate();
+
+            this->cursor_move(
+                coordinates(
+                    this->text.count() - 1,
+                    this->text.last().length()));
+
+            this->cursor_activate();
+            break;
+
         case Qt::Key_A:
             this->cursor_deactivate();
 
@@ -154,6 +173,32 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 
         case Qt::Key_V:
             this->write(QApplication::clipboard()->text());
+            break;
+        }
+    }
+
+    else if (event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))
+    {
+        switch (event->key())
+        {
+        case Qt::Key_Home:
+            this->cursor_deactivate();
+
+            this->cursor_move(coordinates(0, 0), true);
+
+            this->cursor_activate();
+            break;
+
+        case Qt::Key_End:
+            this->cursor_deactivate();
+
+            this->cursor_move(
+                coordinates(
+                    this->text.count() - 1,
+                    this->text.last().length()),
+                true);
+
+            this->cursor_activate();
             break;
         }
     }
