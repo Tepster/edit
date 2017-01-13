@@ -168,6 +168,7 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             break;
 
         case Qt::Key_C:
+            // copy selection
             if (this->cursor.selection_mode)
             {
                 QString text;
@@ -188,6 +189,13 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
                 });
 
                 QApplication::clipboard()->setText(text);
+            }
+
+            // copy active line
+            else
+            {
+                QApplication::clipboard()
+                    ->setText(this->active_line() + this->newline_character);
             }
             break;
 
