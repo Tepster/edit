@@ -199,6 +199,53 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             }
             break;
 
+        case Qt::Key_X:
+            this->cursor_deactivate();
+
+            // cut selection
+            if (this->cursor.selection_mode)
+            {
+                QString text;
+
+                coordinates begin, end;
+                this->get_selected_range(begin, end);
+
+                this->each_cell(begin, end, [&](const coordinates &coords)
+                {
+                    if (this->text[coords.row].length() > coords.col)
+                    {
+                        text += this->text[coords.row][coords.col];
+                    }
+                    else
+                    {
+                        text += this->newline_character;
+                    }
+                });
+
+                QApplication::clipboard()->setText(text);
+
+                this->delete_chars(begin, end);
+
+                this->cursor.selection_mode = false;
+                this->cursor.coords = begin;
+            }
+
+            // cut active line
+            else
+            {
+                QApplication::clipboard()
+                    ->setText(this->active_line() + this->newline_character);
+
+                this->text.removeAt(this->cursor.row());
+
+                this->cursor.col() = 0;
+            }
+
+            this->redraw();
+
+            this->cursor_activate();
+            break;
+
         case Qt::Key_V:
             this->write(QApplication::clipboard()->text());
             break;
