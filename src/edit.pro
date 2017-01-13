@@ -25,6 +25,7 @@ HEADERS  += \
     _includes/editor/drawing_manager.h \
     _includes/editor/scrollbar.h \
     _includes/editor/vscrollbar.h \
-    _includes/editor/sh_rules.h
+    _includes/editor/sh_rules.h \
+    _includes/utils.h
 
 INCLUDEPATH += _includes

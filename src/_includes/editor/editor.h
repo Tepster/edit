@@ -194,6 +194,21 @@ class _t::editor::editor : public QWidget
 
 
     /**
+     * Moves cursor one 'word' left.
+     *
+     * @param bool select
+     */
+    void go_word_left(bool select);
+
+    /**
+     * Moves cursor one 'word' right.
+     *
+     * @param bool select
+     */
+    void go_word_right(bool select);
+
+
+    /**
      * Counts the cell size and loads it to the cell_size variable.
      */
     void update_cell_size();

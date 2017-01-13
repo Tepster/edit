@@ -1,5 +1,7 @@
 #include "editor/editor.h"
 
+#include <functional>
+
 #include <QApplication>
 #include <QClipboard>
 
@@ -12,6 +14,8 @@
 #include <QFont>
 #include <QFontDatabase>
 #include <QFontMetrics>
+
+#include "utils.h"
 
 
 _t::editor::editor::editor()
@@ -113,6 +117,22 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         switch (event->key())
         {
+        case Qt::Key_Left:
+            this->cursor_deactivate();
+
+            this->go_word_left(false);
+
+            this->cursor_activate();
+            break;
+
+        case Qt::Key_Right:
+            this->cursor_deactivate();
+
+            this->go_word_right(false);
+
+            this->cursor_activate();
+            break;
+
         case Qt::Key_Home:
             this->cursor_deactivate();
 
@@ -181,6 +201,22 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
     {
         switch (event->key())
         {
+        case Qt::Key_Left:
+            this->cursor_deactivate();
+
+            this->go_word_left(true);
+
+            this->cursor_activate();
+            break;
+
+        case Qt::Key_Right:
+            this->cursor_deactivate();
+
+            this->go_word_right(true);
+
+            this->cursor_activate();
+            break;
+
         case Qt::Key_Up:
             // shifting lines upwards
             if (this->cursor.row() > 0)
@@ -547,6 +583,95 @@ void _t::editor::editor::resizeEvent(QResizeEvent *)
 void _t::editor::editor::vscrolled()
 {
     this->redraw();
+}
+
+
+void _t::editor::editor::go_word_left(bool select)
+{
+    // temporary coords we'll use to get the final cursor location
+    coordinates tmp(this->cursor.coords);
+
+    --tmp;
+
+    // cursor not at the end of line (otherwise it came from next
+    // line, meaning the cursor decrementation is all we need to do)
+    if (tmp.col != this->text.at(tmp.row).length())
+    {
+        std::function<bool(const QChar &ch)> compare;
+
+        // cursor jumps over characters
+        if (_t::utils::is_character(this->text.at(tmp.row).at(tmp.col)))
+        {
+            compare = _t::utils::is_character;
+        }
+
+        // cursor jumps over special characters
+        else if (_t::utils::is_special(this->text.at(tmp.row).at(tmp.col)))
+        {
+            compare = _t::utils::is_special;
+        }
+
+        // cursor jumps over whitespaces
+        else
+        {
+            compare = _t::utils::is_whitespace;
+        }
+
+        while (tmp.col != 0 && compare(this->text.at(tmp.row).at(tmp.col)))
+        {
+            --tmp.col;
+        }
+
+        // correct the cursor position
+        if (tmp.col != 0)
+        {
+            ++tmp.col;
+        }
+    }
+
+    this->cursor_move(tmp, select);
+}
+
+void _t::editor::editor::go_word_right(bool select)
+{
+    // temporary coords we'll use to get the final cursor location
+    coordinates tmp(this->cursor.coords);
+
+    // cursor at the end of line
+    if (tmp.col == this->text.at(tmp.row).length())
+    {
+        ++tmp;
+    }
+    else
+    {
+        std::function<bool(const QChar &ch)> compare;
+
+        // cursor jumps over characters
+        if (_t::utils::is_character(this->text.at(tmp.row).at(tmp.col)))
+        {
+            compare = _t::utils::is_character;
+        }
+
+        // cursor jumps over special characters
+        else if (_t::utils::is_special(this->text.at(tmp.row).at(tmp.col)))
+        {
+            compare = _t::utils::is_special;
+        }
+
+        // cursor jumps over whitespaces
+        else
+        {
+            compare = _t::utils::is_whitespace;
+        }
+
+        while (tmp.col != this->text.at(tmp.row).length()
+            && compare(this->text.at(tmp.row).at(tmp.col)))
+        {
+            ++tmp.col;
+        }
+    }
+
+    this->cursor_move(tmp, select);
 }
 
 
