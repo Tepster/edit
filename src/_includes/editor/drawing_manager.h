@@ -1,6 +1,8 @@
 #ifndef _T_EDITOR_DRAWING_MANAGER_H
 #define _T_EDITOR_DRAWING_MANAGER_H
 
+#include "../editor.h"
+
 #include <QPixmap>
 #include <QPainter>
 
@@ -13,14 +15,6 @@
 
 #include "editor/coordinates.h"
 
-
-namespace _t
-{
-    namespace editor
-    {
-        class drawing_manager;
-    }
-}
 
 /**
  * The _t::editor::drawing_manager class which provides functions

@@ -15,6 +15,7 @@
 #include <QFontDatabase>
 #include <QFontMetrics>
 
+#include "editor/find_dialog.h"
 #include "utils.h"
 
 
@@ -85,11 +86,14 @@ _t::editor::editor::editor()
     this->setLayout(layout);
 
     this->setFocusPolicy(Qt::StrongFocus);
+
+    this->find_d = new _t::editor::find_dialog(this);
 }
 
 _t::editor::editor::~editor()
 {
     delete this->vscrollbar;
+    delete this->find_d;
 }
 
 
@@ -248,6 +252,11 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
 
         case Qt::Key_V:
             this->write(QApplication::clipboard()->text());
+            break;
+
+        case Qt::Key_F:
+            this->find_d->show();
+            this->find_d->activateWindow();
             break;
         }
     }
@@ -533,8 +542,8 @@ void _t::editor::editor::wheelEvent(QWheelEvent *event)
     else
     {
         // 4 rows per usual wheel step
-        qreal target_shift_px = qreal(this->shift.y()) - qreal(event->delta()) / 30
-            * this->cell_size.height();
+        qreal target_shift_px = qreal(this->shift.y()) - qreal(event->delta())
+            / 30 * this->cell_size.height();
 
         this->vscrollbar->scroll(target_shift_px);
     }
@@ -852,11 +861,63 @@ void _t::editor::editor::move_cursor_to_beginning()
 }
 
 
-void _t::editor::editor::set_sh_rules(const QVector<QPair<QColor, QString>> *rules)
+void _t::editor::editor::set_sh_rules(
+    const QVector<QPair<QColor, QString>> *rules)
 {
     this->sh_rules = rules;
 
     this->redraw();
+}
+
+
+void _t::editor::editor::find_next(const QString &pattern, bool regex)
+{
+    QString text = this->get_text();
+
+    // get cursor position in text (QString)
+    qint32 cursor_absolute_pos = 0;
+    for (qint32 i = 0; i < this->cursor.row(); ++i)
+    {
+        cursor_absolute_pos += this->text.at(i).length() + 1;
+    }
+    cursor_absolute_pos += this->cursor.col();
+
+    // cursor is at the end of file
+    if (cursor_absolute_pos == text.length())
+    {
+        this->find_d->got_to_eof();
+
+        // put cursor to [0,0]
+        this->cursor.selection_mode = false;
+        this->cursor.coords = coordinates(0, 0);
+        this->redraw();
+    }
+    else
+    {
+        qint32 pos = text.indexOf(pattern, cursor_absolute_pos);
+
+        // pattern found
+        if (pos >= 0)
+        {
+            this->deselect();
+
+            this->cursor.coords.set(0, 0);
+            this->cursor.coords += pos;
+            this->cursor_move(this->cursor.coords + pattern.length(), true);
+
+            this->parentWidget()->activateWindow();
+        }
+
+        // not found - go to [0,0]
+        else
+        {
+            this->find_d->got_to_eof();
+
+            this->cursor.selection_mode = false;
+            this->cursor.coords = coordinates(0, 0);
+            this->redraw();
+        }
+    }
 }
 
 

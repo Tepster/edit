@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     editor/drawing_manager.cpp \
     editor/editor.cpp \
     editor/vscrollbar.cpp \
-    editor/scrollbar.cpp
+    editor/scrollbar.cpp \
+    editor/find_dialog.cpp
 
 HEADERS  += \
     _includes/main_window.h \
@@ -26,6 +27,8 @@ HEADERS  += \
     _includes/editor/scrollbar.h \
     _includes/editor/vscrollbar.h \
     _includes/editor/sh_rules.h \
-    _includes/utils.h
+    _includes/utils.h \
+    _includes/editor/find_dialog.h \
+    _includes/editor.h
 
 INCLUDEPATH += _includes

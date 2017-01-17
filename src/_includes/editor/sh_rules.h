@@ -1,20 +1,14 @@
 #ifndef _T_EDITOR_SH_RULES_H
 #define _T_EDITOR_SH_RULES_H
 
+#include "../editor.h"
+
 #include <QVector>
 #include <QPair>
 
 #include <QColor>
 #include <QString>
 
-
-namespace _t
-{
-    namespace editor
-    {
-        class sh_rules;
-    }
-}
 
 class _t::editor::sh_rules
 {

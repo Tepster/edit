@@ -1,6 +1,8 @@
 #ifndef _T_EDITOR_VSCROLLBAR_H
 #define _T_EDITOR_VSCROLLBAR_H
 
+#include "../editor.h"
+
 #include <QMouseEvent>
 #include <QResizeEvent>
 
@@ -8,14 +10,6 @@
 
 #include "scrollbar.h"
 
-
-namespace _t
-{
-    namespace editor
-    {
-        class vscrollbar;
-    }
-}
 
 /**
  * The _t::editor::vscrollbar representing the vertical scrollbar of the editor.

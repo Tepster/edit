@@ -1,16 +1,10 @@
 #ifndef _T_EDITOR_COORDINATES_H
 #define _T_EDITOR_COORDINATES_H
 
+#include "../editor.h"
+
 #include <QStringList>
 
-
-namespace _t
-{
-    namespace editor
-    {
-        struct coordinates;
-    }
-}
 
 /**
  * The _t::editor::coordinates struct which stores the row and column values

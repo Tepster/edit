@@ -1,18 +1,12 @@
 #ifndef _T_EDITOR_CURSOR_H
 #define _T_EDITOR_CURSOR_H
 
+#include "../editor.h"
+
 #include <QPixmap>
 
-#include "editor/coordinates.h"
+#include "coordinates.h"
 
-
-namespace _t
-{
-    namespace editor
-    {
-        class cursor;
-    }
-}
 
 /**
  * The _t::editor::cursor struct.

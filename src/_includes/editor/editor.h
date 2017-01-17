@@ -1,6 +1,8 @@
 #ifndef _T_EDITOR_EDITOR_H
 #define _T_EDITOR_EDITOR_H
 
+#include "editor.h"
+
 #include <functional>
 
 #include <QWidget>
@@ -11,6 +13,7 @@
 #include <QWheelEvent>
 #include <QFocusEvent>
 #include <QResizeEvent>
+#include <QCloseEvent>
 
 #include <QTimer>
 
@@ -32,14 +35,6 @@
 #include "editor/drawing_manager.h"
 #include "editor/vscrollbar.h"
 
-
-namespace _t
-{
-    namespace editor
-    {
-        class editor;
-    }
-}
 
 /**
  * The _t::editor::editor class representing one editor control
@@ -154,6 +149,12 @@ class _t::editor::editor : public QWidget
      * @var const QVector<QPair<QColor, QString>> * sh_rules
      */
     const QVector<QPair<QColor, QString>> *sh_rules = 0;
+
+
+    /**
+     * @var _t::editor::find_dialog * find_d
+     */
+    _t::editor::find_dialog *find_d;
 
 
 
@@ -416,6 +417,15 @@ public:
      * @param const QVector<QPair<QColor, QString>> * rules
      */
     void set_sh_rules(const QVector<QPair<QColor, QString>> *rules);
+
+
+    /**
+     * Finds the next occurence of the string in the editor's text.
+     *
+     * @param const QString & pattern
+     * @param       bool      regex
+     */
+    void find_next(const QString &pattern, bool regex);
 };
 
 #endif // _T_EDITOR_EDITOR_H

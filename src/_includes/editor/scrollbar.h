@@ -1,6 +1,8 @@
 #ifndef _T_EDITOR_SCROLLBAR_H
 #define _T_EDITOR_SCROLLBAR_H
 
+#include "../editor.h"
+
 #include <QWidget>
 
 #include <QMouseEvent>
@@ -10,14 +12,6 @@
 
 #include "controls/label.h"
 
-
-namespace _t
-{
-    namespace editor
-    {
-        class scrollbar;
-    }
-}
 
 /**
  * The _t::editor::scrollbar abstract class as a base for vertical

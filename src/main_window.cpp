@@ -88,6 +88,10 @@ void _t::main_window::closeEvent(QCloseEvent *event)
     {
         event->ignore();
     }
+    else
+    {
+        QApplication::closeAllWindows();
+    }
 }
 
 
