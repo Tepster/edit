@@ -15,6 +15,8 @@
 #include <QFontDatabase>
 #include <QFontMetrics>
 
+#include <QRegExp>
+
 #include "editor/find_dialog.h"
 #include "utils.h"
 
@@ -894,7 +896,19 @@ void _t::editor::editor::find_next(const QString &pattern, bool regex)
     }
     else
     {
-        qint32 pos = text.indexOf(pattern, cursor_absolute_pos);
+        qint32 pos, length;
+
+        if (regex)
+        {
+            QRegExp re(pattern);
+            pos = re.indexIn(text, cursor_absolute_pos);
+            length = re.matchedLength();
+        }
+        else
+        {
+            pos = text.indexOf(pattern, cursor_absolute_pos);
+            length = pattern.length();
+        }
 
         // pattern found
         if (pos >= 0)
@@ -903,7 +917,7 @@ void _t::editor::editor::find_next(const QString &pattern, bool regex)
 
             this->cursor.coords.set(0, 0);
             this->cursor.coords += pos;
-            this->cursor_move(this->cursor.coords + pattern.length(), true);
+            this->cursor_move(this->cursor.coords + length, true);
 
             this->parentWidget()->activateWindow();
         }
