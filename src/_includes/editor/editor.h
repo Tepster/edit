@@ -428,6 +428,17 @@ public:
 
 
     /**
+     * Displays the find dialog.
+     */
+    void show_find_dialog();
+
+    /**
+     * Displays the replace dialog.
+     */
+    void show_replace_dialog();
+
+
+    /**
      * Finds the next occurence of the string in the editor's text.
      *
      * @param const QString & pattern

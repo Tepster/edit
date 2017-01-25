@@ -25,6 +25,7 @@ _t::main_window::main_window(QWidget *parent)
     this->menubar.setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
 
     this->menubar.addMenu(&this->file_menu);
+    this->menubar.addMenu(&this->edit_menu);
     this->menubar.addMenu(&this->sh_menu);
 
     this->file_menu.setTitle("File");
@@ -55,6 +56,12 @@ _t::main_window::main_window(QWidget *parent)
         "Quit",
         this, SLOT(menu_file_quit()),
         QKeySequence::Quit);
+
+
+    this->edit_menu.setTitle("Edit");
+
+    this->edit_menu.addAction("Find", this, SLOT(menu_edit_find()));
+    this->edit_menu.addAction("Replace", this, SLOT(menu_edit_replace()));
 
 
     this->sh_menu.setTitle("Syntax Highlighting");
@@ -302,6 +309,17 @@ void _t::main_window::menu_file_quit()
     {
         QApplication::quit();
     }
+}
+
+
+void _t::main_window::menu_edit_find()
+{
+    this->editor->show_find_dialog();
+}
+
+void _t::main_window::menu_edit_replace()
+{
+    this->editor->show_replace_dialog();
 }
 
 

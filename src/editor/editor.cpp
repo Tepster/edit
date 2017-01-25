@@ -257,13 +257,11 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
             break;
 
         case Qt::Key_F:
-            this->find_d->show();
-            this->find_d->activateWindow();
+            this->show_find_dialog();
             break;
 
         case Qt::Key_H:
-            this->replace_d->show();
-            this->replace_d->activateWindow();
+            this->show_replace_dialog();
             break;
         }
     }
@@ -874,6 +872,19 @@ void _t::editor::editor::set_sh_rules(
     this->sh_rules = rules;
 
     this->redraw();
+}
+
+
+void _t::editor::editor::show_find_dialog()
+{
+    this->find_d->show();
+    this->find_d->activateWindow();
+}
+
+void _t::editor::editor::show_replace_dialog()
+{
+    this->replace_d->show();
+    this->replace_d->activateWindow();
 }
 
 

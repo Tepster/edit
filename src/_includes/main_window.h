@@ -40,6 +40,11 @@ class _t::main_window : public QWidget
     QMenu file_menu;
 
     /**
+     * @var QMenu edit_menu
+     */
+    QMenu edit_menu;
+
+    /**
      * @var QMenu sh_menu
      */
     QMenu sh_menu;
@@ -126,6 +131,17 @@ private slots:
      * Quits the application.
      */
     void menu_file_quit();
+
+
+    /**
+     * Shows the find dialog.
+     */
+    void menu_edit_find();
+
+    /**
+     * Shows the replace dialog.
+     */
+    void menu_edit_replace();
 
 
     /**
