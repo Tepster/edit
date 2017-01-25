@@ -15,7 +15,8 @@ SOURCES += main.cpp \
     editor/editor.cpp \
     editor/vscrollbar.cpp \
     editor/scrollbar.cpp \
-    editor/find_dialog.cpp
+    editor/find_dialog.cpp \
+    editor/replace_dialog.cpp
 
 HEADERS  += \
     _includes/main_window.h \
@@ -29,6 +30,7 @@ HEADERS  += \
     _includes/editor/sh_rules.h \
     _includes/utils.h \
     _includes/editor/find_dialog.h \
+    _includes/editor/replace_dialog.h \
     _includes/editor.h
 
 INCLUDEPATH += _includes

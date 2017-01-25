@@ -35,6 +35,9 @@
 #include "editor/drawing_manager.h"
 #include "editor/vscrollbar.h"
 
+#include "editor/find_dialog.h"
+#include "editor/replace_dialog.h"
+
 
 /**
  * The _t::editor::editor class representing one editor control
@@ -155,6 +158,11 @@ class _t::editor::editor : public QWidget
      * @var _t::editor::find_dialog * find_d
      */
     _t::editor::find_dialog *find_d;
+
+    /**
+     * @var _t::editor::replace_dialog * replace_d
+     */
+    _t::editor::replace_dialog *replace_d;
 
 
 
@@ -426,6 +434,20 @@ public:
      * @param       bool      regex
      */
     void find_next(const QString &pattern, bool regex);
+
+    /**
+     * Replaces all occurences in the string.
+     *
+     * @param const QString & find
+     * @param const QString & replace
+     * @param       bool      case_sensitive
+     * @param       bool      regex
+     */
+    void replace(
+        const QString &find,
+        const QString &replace,
+        bool case_sensitive,
+        bool regex);
 };
 
 #endif // _T_EDITOR_EDITOR_H

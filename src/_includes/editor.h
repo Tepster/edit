@@ -8,6 +8,7 @@ namespace _t
         class editor;
 
         class find_dialog;
+        class replace_dialog;
 
         class scrollbar;
         class vscrollbar;

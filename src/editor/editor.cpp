@@ -17,7 +17,6 @@
 
 #include <QRegExp>
 
-#include "editor/find_dialog.h"
 #include "utils.h"
 
 
@@ -90,6 +89,7 @@ _t::editor::editor::editor()
     this->setFocusPolicy(Qt::StrongFocus);
 
     this->find_d = new _t::editor::find_dialog(this);
+    this->replace_d = new _t::editor::replace_dialog(this);
 }
 
 _t::editor::editor::~editor()
@@ -259,6 +259,11 @@ void _t::editor::editor::keyPressEvent(QKeyEvent *event)
         case Qt::Key_F:
             this->find_d->show();
             this->find_d->activateWindow();
+            break;
+
+        case Qt::Key_H:
+            this->replace_d->show();
+            this->replace_d->activateWindow();
             break;
         }
     }
@@ -932,6 +937,36 @@ void _t::editor::editor::find_next(const QString &pattern, bool regex)
             this->redraw();
         }
     }
+}
+
+void _t::editor::editor::replace(
+    const QString &find,
+    const QString &replace,
+    bool case_sensitive,
+    bool regex)
+{
+    Qt::CaseSensitivity cs = case_sensitive
+        ? Qt::CaseSensitive
+        : Qt::CaseInsensitive;
+
+    if (regex)
+    {
+        QRegExp re(find, cs);
+
+        for (QString &line : this->text)
+        {
+            line = line.replace(re, replace);
+        }
+    }
+    else
+    {
+        for (QString &line : this->text)
+        {
+            line = line.replace(find, replace, cs);
+        }
+    }
+
+    this->redraw();
 }
 
 
